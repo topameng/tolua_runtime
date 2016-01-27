@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2014.9 , topameng(topameng@gmail.com)
  * Use, modification and distribution are subject to the "The MIT License"
 */
@@ -66,14 +66,6 @@ static int tag = 0;
 static int gettag = 0;
 static int settag = 0;
 static int vptr = 1;
-
-static int _print(lua_State* L, const char* str)
-{
-    lua_getglobal(L, "print");
-    lua_pushstring(L, str);    
-    lua_call(L, 1, 0);
-    return 0;
-}
 
 
 /*---------------------------tolua extend functions--------------------------------*/
