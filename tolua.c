@@ -67,6 +67,14 @@ static int gettag = 0;
 static int settag = 0;
 static int vptr = 1;
 
+static int _print(lua_State* L, const char* str)
+{
+    lua_getglobal(L, "print");
+    lua_pushstring(L, str);    
+    lua_call(L, 1, 0);
+    return 0;
+}
+
 
 /*---------------------------tolua extend functions--------------------------------*/
 LUALIB_API void* tolua_tag()
@@ -1869,7 +1877,7 @@ static int _int64new(lua_State* L)
     else if (type == LUA_TNUMBER)
     {
         int64_t n1 = (int64_t)luaL_checknumber(L, 1);
-        int64_t n2 = (int64_t)luaL_checknumber(L, 2);
+        int64_t n2 = (int64_t)lua_tonumber(L, 2);
         n = n1 + (n2 << 32);
     }
 
