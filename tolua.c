@@ -1,4 +1,4 @@
-﻿/* 
+/* 
  * Copyright (c) 2014.9 , topameng(topameng@gmail.com)
  * Use, modification and distribution are subject to the "The MIT License"
 */
@@ -250,7 +250,7 @@ LUALIB_API void tolua_pushclr(lua_State* L, float r, float g, float b, float a)
 LUALIB_API void tolua_pushlayermask(lua_State* L, int mask)
 {
     lua_getref(L, LUA_RIDX_PACKLAYERMASK);
-    lua_pushinteger(L, mask);
+    lua_pushnumber(L, mask);
     lua_call(L, 1, 1);
 }
 
@@ -1157,7 +1157,7 @@ LUA_API int tolua_getvaluetype(lua_State* L, int stackPos)
 	lua_getref(L, LUA_RIDX_CHECKVALUE);
 	lua_pushvalue(L, stackPos);
 	lua_call(L, 1, 1);
-	int ret = (int)luaL_checkinteger(L, -1);
+	int ret = (int)luaL_checknumber(L, -1);
 	lua_pop(L, 1);
 	return ret;
 }
@@ -1801,7 +1801,7 @@ static int _int64tostring(lua_State* L)
     return 1;
 }
 
-static int _int64toint32(lua_State* L)
+static int _int64tonum2(lua_State* L)
 {
     if (!tolua_isint64(L, 1))
     {
@@ -1814,13 +1814,13 @@ static int _int64toint32(lua_State* L)
     {
         int64_t high = n >> 32;        
         int64_t low = n & 0xFFFFFFFF;
-        lua_pushinteger(L, (lua_Integer)low);
-        lua_pushinteger(L, (lua_Integer)high);
+        lua_pushnumber(L, low);
+        lua_pushnumber(L, high);
     }
     else
     {
-        lua_pushinteger(L, 0);
-        lua_pushinteger(L, 0);
+        lua_pushnumber(L, 0);
+        lua_pushnumber(L, 0);
     }
 
     return 2;
@@ -1868,8 +1868,8 @@ static int _int64new(lua_State* L)
     }
     else if (type == LUA_TNUMBER)
     {
-        int64_t n1 = (int64_t)luaL_checkinteger(L, 1);
-        int64_t n2 = (int64_t)lua_tointeger(L, 2);
+        int64_t n1 = (int64_t)luaL_checknumber(L, 1);
+        int64_t n2 = (int64_t)luaL_checknumber(L, 2);
         n = n1 + (n2 << 32);
     }
 
@@ -1942,11 +1942,11 @@ void tolua_openint64(lua_State* L)
 
     lua_pushstring(L, "equals");
     lua_pushcfunction(L, _int64equals);
-    lua_rawset(L, -3);    
+    lua_rawset(L, -3);     
 
-    lua_pushstring(L, "toint32");
-    lua_pushcfunction(L, _int64toint32);
-    lua_rawset(L, -3);    
+    lua_pushstring(L, "tonum2");
+    lua_pushcfunction(L, _int64tonum2);
+    lua_rawset(L, -3);       
 
     /*lua_pushstring(L, "tofixed");
     lua_pushcfunction(L, _int64tofixed);
