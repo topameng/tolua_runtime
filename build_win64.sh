@@ -23,6 +23,9 @@ gcc tolua.c \
  pb.c \
  lpeg.c \
  struct.c \
+ cjson/strbuf.c \
+ cjson/lua_cjson.c \
+ cjson/fpconv.c \
  luasocket/auxiliar.c \
  luasocket/buffer.c \
  luasocket/except.c \

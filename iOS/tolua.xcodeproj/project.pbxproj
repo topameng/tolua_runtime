@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		842A59B41C85B87E00EA2815 /* fpconv.c in Sources */ = {isa = PBXBuildFile; fileRef = 842A59AE1C85B87E00EA2815 /* fpconv.c */; };
+		842A59B51C85B87E00EA2815 /* lua_cjson.c in Sources */ = {isa = PBXBuildFile; fileRef = 842A59B01C85B87E00EA2815 /* lua_cjson.c */; };
+		842A59B61C85B87E00EA2815 /* strbuf.c in Sources */ = {isa = PBXBuildFile; fileRef = 842A59B11C85B87E00EA2815 /* strbuf.c */; };
 		847D0DE61C54CA0700A49E91 /* tolua.c in Sources */ = {isa = PBXBuildFile; fileRef = 847D0DE51C54CA0700A49E91 /* tolua.c */; };
 		847D0DE81C54CA1F00A49E91 /* struct.c in Sources */ = {isa = PBXBuildFile; fileRef = 847D0DE71C54CA1F00A49E91 /* struct.c */; };
 		847D0DEA1C54CA2500A49E91 /* lpeg.c in Sources */ = {isa = PBXBuildFile; fileRef = 847D0DE91C54CA2500A49E91 /* lpeg.c */; };
@@ -43,6 +46,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		842A59AE1C85B87E00EA2815 /* fpconv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fpconv.c; sourceTree = "<group>"; };
+		842A59AF1C85B87E00EA2815 /* fpconv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fpconv.h; sourceTree = "<group>"; };
+		842A59B01C85B87E00EA2815 /* lua_cjson.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lua_cjson.c; sourceTree = "<group>"; };
+		842A59B11C85B87E00EA2815 /* strbuf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = strbuf.c; sourceTree = "<group>"; };
+		842A59B21C85B87E00EA2815 /* strbuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strbuf.h; sourceTree = "<group>"; };
 		847D0D9B1C54C8E000A49E91 /* libtolua.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libtolua.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		847D0DE51C54CA0700A49E91 /* tolua.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tolua.c; path = ../../tolua.c; sourceTree = "<group>"; };
 		847D0DE71C54CA1F00A49E91 /* struct.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = struct.c; path = ../../struct.c; sourceTree = "<group>"; };
@@ -95,6 +103,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		842A59AD1C85B87E00EA2815 /* cjson */ = {
+			isa = PBXGroup;
+			children = (
+				842A59AE1C85B87E00EA2815 /* fpconv.c */,
+				842A59AF1C85B87E00EA2815 /* fpconv.h */,
+				842A59B01C85B87E00EA2815 /* lua_cjson.c */,
+				842A59B11C85B87E00EA2815 /* strbuf.c */,
+				842A59B21C85B87E00EA2815 /* strbuf.h */,
+			);
+			name = cjson;
+			path = ../../cjson;
+			sourceTree = "<group>";
+		};
 		847D0D921C54C8E000A49E91 = {
 			isa = PBXGroup;
 			children = (
@@ -115,6 +136,7 @@
 		847D0D9D1C54C8E000A49E91 /* tolua */ = {
 			isa = PBXGroup;
 			children = (
+				842A59AD1C85B87E00EA2815 /* cjson */,
 				847D0DED1C54CA3400A49E91 /* luasocket */,
 				847D0DE91C54CA2500A49E91 /* lpeg.c */,
 				847D0DE51C54CA0700A49E91 /* tolua.c */,
@@ -226,11 +248,14 @@
 				847D0E1F1C54CA3400A49E91 /* usocket.c in Sources */,
 				847D0E101C54CA3400A49E91 /* auxiliar.c in Sources */,
 				847D0E161C54CA3400A49E91 /* luasocket_scripts.c in Sources */,
+				842A59B41C85B87E00EA2815 /* fpconv.c in Sources */,
+				842A59B61C85B87E00EA2815 /* strbuf.c in Sources */,
 				847D0E181C54CA3400A49E91 /* options.c in Sources */,
 				847D0E121C54CA3400A49E91 /* except.c in Sources */,
 				847D0DE81C54CA1F00A49E91 /* struct.c in Sources */,
 				847D0E141C54CA3400A49E91 /* io.c in Sources */,
 				847D0E1A1C54CA3400A49E91 /* serial.c in Sources */,
+				842A59B51C85B87E00EA2815 /* lua_cjson.c in Sources */,
 				847D0E131C54CA3400A49E91 /* inet.c in Sources */,
 				847D0DE61C54CA0700A49E91 /* tolua.c in Sources */,
 				847D0DEC1C54CA2C00A49E91 /* pb.c in Sources */,

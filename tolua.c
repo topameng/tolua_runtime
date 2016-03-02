@@ -1,6 +1,25 @@
-/* 
- * Copyright (c) 2014.9 , topameng(topameng@gmail.com)
- * Use, modification and distribution are subject to the "The MIT License"
+/*
+The MIT License (MIT)
+
+Copyright (c) 2015-2016 topameng(topameng@qq.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 */
 
 #include <string.h>
@@ -61,20 +80,11 @@
 #define FLAG_INDEX_ERROR 1
 #define FLAG_INT64       2
 
-static int toluaflags       = 1;
+static int toluaflags = 1;
 static int tag = 0;  
 static int gettag = 0;
 static int settag = 0;
 static int vptr = 1;
-
-static int _print(lua_State* L, const char* str)
-{
-    lua_getglobal(L, "print");
-    lua_pushstring(L, str);    
-    lua_call(L, 1, 0);
-    return 0;
-}
-
 
 /*---------------------------tolua extend functions--------------------------------*/
 LUALIB_API void* tolua_tag()
@@ -92,7 +102,7 @@ LUALIB_API void tolua_newudata(lua_State *L, int val)
 
 LUALIB_API int tolua_rawnetobj(lua_State *L, int index)
 {
-    int *udata = lua_touserdata(L, index);
+    int* udata = (int*)lua_touserdata(L, index);
     
     if (udata != NULL) 
     {
@@ -107,7 +117,7 @@ LUALIB_API int tolua_rawnetobj(lua_State *L, int index)
         if (lua_isuserdata(L, -1))
         {
             lua_replace(L, index);
-            udata = lua_touserdata(L, index);
+            udata = (int*)lua_touserdata(L, index);
 
             if (udata != NULL) 
             {
@@ -151,10 +161,10 @@ LUALIB_API void tolua_getvec3(lua_State* L, int pos, float* x, float* y, float* 
 	lua_getref(L, LUA_RIDX_UNPACKVEC3);
 	lua_pushvalue(L, pos);
 	lua_call(L, 1, 3);
-	*x = (float)lua_tonumber(L, -3);
-	*y = (float)lua_tonumber(L, -2);
-	*z = (float)lua_tonumber(L, -1);
-	lua_pop(L, 3);
+    *x = (float)lua_tonumber(L, -3);
+    *y = (float)lua_tonumber(L, -2);
+    *z = (float)lua_tonumber(L, -1);
+    lua_pop(L, 3);
 }
 
 LUALIB_API void tolua_getvec4(lua_State* L, int pos, float* x, float* y, float* z, float* w)
@@ -263,7 +273,7 @@ LUALIB_API void tolua_pushlayermask(lua_State* L, int mask)
 }
 
 
-LUA_API const char* tolua_tolstring(lua_State *L, int index, int* len) 
+LUA_API const char* tolua_tolstring(lua_State* L, int index, int* len) 
 {
     size_t sz;
     const char* ret = lua_tolstring(L, index, &sz);
@@ -271,26 +281,195 @@ LUA_API const char* tolua_tolstring(lua_State *L, int index, int* len)
     return ret;
 }
 
-LUA_API void  tolua_pushlstring(lua_State *L, const char *s, int l)
+LUA_API void tolua_pushlstring(lua_State* L, const char* s, int l)
 {
     lua_pushlstring(L, s, (size_t)l);
 }
 
-LUA_API void tolua_newuserdata (lua_State *L, int val)
+LUA_API void* tolua_newuserdata(lua_State* L, int sz)
 {
-    int* pointer = (int*)lua_newuserdata(L, sizeof(int));
-    *pointer = val;
+    return lua_newuserdata(L, (size_t)sz);    
 }
 
-LUA_API int tolua_objlen(lua_State *L, int idx)
+LUA_API int32_t tolua_objlen(lua_State* L, int idx)
 {
     size_t len = lua_objlen(L, idx);
-    return (int)len;
+    return (int32_t)len;
 }
 
-LUALIB_API int tolua_loadbuffer(lua_State *L, const char *buff, int sz, const char *name)
+LUA_API bool tolua_toboolean(lua_State* L, int idx) 
+{
+    int value = lua_toboolean(L, idx);
+    return value == 0 ? false : true;
+}
+
+LUA_API int32_t tolua_tointeger(lua_State* L, int idx) 
+{
+    return (int32_t)lua_tointeger(L, idx);
+}
+
+LUALIB_API int tolua_loadbuffer(lua_State* L, const char* buff, int sz, const char* name)
 {
     return luaL_loadbuffer(L, buff, (size_t)sz, name);
+}
+
+static int _lua_getfield(lua_State* L)
+{
+    const char* name = lua_tostring(L, 2);    
+    lua_getfield(L, 1, name);    
+    return 1;
+}
+        
+LUA_API int tolua_getfield(lua_State* L, int idx, const char* field)
+{
+    idx = abs_index(L, idx);    
+    lua_pushcfunction(L, _lua_getfield);
+    lua_pushvalue(L, idx);
+    lua_pushstring(L, field);
+    return lua_pcall(L, 2, 1, 0);
+}
+
+static int _lua_setfield(lua_State* L)
+{
+    const char* name = lua_tostring(L, 2);
+    lua_setfield(L, 1, name);
+    return 0;
+}
+
+LUA_API int tolua_setfield(lua_State* L, int idx, const char* key)        
+{
+    int top = lua_gettop(L);
+    idx = abs_index(L, idx);
+    lua_pushcfunction(L, _lua_setfield);
+    lua_pushvalue(L, idx);
+    lua_pushstring(L, key);
+    lua_pushvalue(L, top);
+    lua_remove(L, top);
+    return lua_pcall(L, 3, -1, 0);
+}
+
+static int _lua_gettable(lua_State* L)
+{    
+    lua_gettable(L, 1);    
+    return 1;
+}
+
+LUA_API int tolua_gettable(lua_State* L, int idx)
+{
+    int top = lua_gettop(L);
+    idx = abs_index(L, idx);
+    lua_pushcfunction(L, _lua_gettable);
+    lua_pushvalue(L, idx);
+    lua_pushvalue(L, top);
+    lua_remove(L, top);
+    return lua_pcall(L, 2, -1, 0);
+}
+
+static int _lua_settable(lua_State* L)
+{
+    lua_settable(L, 1);
+    return 0;
+}
+
+LUA_API int tolua_settable(lua_State* L, int idx)
+{
+    int top = lua_gettop(L);
+    idx = abs_index(L, idx);
+    lua_pushcfunction(L, _lua_settable);
+    lua_pushvalue(L, idx);
+    lua_pushvalue(L, top - 1);
+    lua_pushvalue(L, top);
+    lua_remove(L, top);
+    lua_remove(L, top - 1);
+    return lua_pcall(L, 3, -1, 0);
+}
+
+static int tolua_closure(lua_State *L)
+{
+    lua_CFunction fn = (lua_CFunction)lua_tocfunction(L, lua_upvalueindex(2));
+    int r = fn(L);    
+    
+    if (lua_toboolean(L, lua_upvalueindex(1)))
+    {
+        lua_pushboolean(L, 0);
+        lua_replace(L, lua_upvalueindex(1));
+        return lua_error(L);
+    }
+    
+    return r;
+}
+
+//hack for luac, 避免luac error破坏包裹c#函数的异常块(为luajit点赞)
+LUA_API int tolua_pushcclosure(lua_State* L, lua_CFunction fn)
+{        
+    lua_pushboolean(L, 0);
+    lua_pushcfunction(L, fn);
+    lua_pushcclosure(L, tolua_closure, 2);
+    return 0;
+}
+
+static int tolua_pusherror(lua_State* L, const char *fmt, ...)
+{
+    va_list argp;
+    va_start(argp, fmt);
+    luaL_where(L, 1);
+    lua_pushvfstring(L, fmt, argp);
+    va_end(argp);
+    lua_concat(L, 2);
+    return 1;
+}
+
+LUALIB_API int tolua_argerror(lua_State* L, int narg, const char* extramsg)
+{
+    lua_Debug ar;
+    
+    if (!lua_getstack(L, 0, &ar))  /* no stack frame? */
+    {
+        return tolua_pusherror(L, "bad argument #%d (%s)", narg, extramsg);        
+    }
+
+    lua_getinfo(L, "n", &ar);
+
+    if (strcmp(ar.namewhat, "method") == 0) 
+    {
+        narg--;  /* do not count `self' */
+
+        if (narg == 0)  /* error is in the self argument itself? */
+        {
+            return tolua_pusherror(L, "calling " LUA_QS " on bad self (%s)", ar.name, extramsg);
+        }
+    }
+
+    if (ar.name == NULL)
+    {
+        ar.name = "?";
+    }    
+
+    return tolua_pusherror(L, "bad argument #%d to " LUA_QS " (%s)", narg, ar.name, extramsg);
+}
+
+LUALIB_API int tolua_error(lua_State* L, const char* msg)
+{
+    lua_pushboolean(L, 1);
+    lua_replace(L, lua_upvalueindex(1));
+    lua_pushstring(L, msg);
+    return 1;
+}
+
+LUALIB_API int tolua_getn(lua_State* L, int i)
+{
+    return luaL_getn(L, i);
+}
+
+LUALIB_API int tolua_strlen(const char* str)
+{
+    if (str == NULL)
+    {
+        return 0;
+    }
+
+    int len = (int)strlen(str);
+    return len;
 }
 
 static int class_index_event(lua_State* L)
@@ -403,7 +582,7 @@ static int class_index_event(lua_State* L)
         }
 
         lua_settop(L, 2);
-        int *udata = lua_touserdata(L, 1);
+        int *udata = (int*)lua_touserdata(L, 1);
 
         if (*udata == LUA_NULL_USERDATA)
         {
@@ -593,7 +772,7 @@ static int class_newindex_event(lua_State* L)
     	}
 
         lua_settop(L, 3);                                       // stack: t k v
-        int *udata = lua_touserdata(L, 1);
+        int* udata = (int*)lua_touserdata(L, 1);
 
         if (*udata == LUA_NULL_USERDATA)
         {
@@ -1069,8 +1248,12 @@ LUALIB_API void tolua_constant(lua_State* L, const char* name, double value)
 LUALIB_API void tolua_function(lua_State* L, const char* name, lua_CFunction fn)
 {
   	lua_pushstring(L, name);
-  	lua_pushcfunction(L, fn);
+    tolua_pushcclosure(L, fn);
   	lua_rawset(L, -3);
+
+    /*lua_pushstring(L, name);
+    lua_pushcfunction(L, fn);
+    lua_rawset(L, -3);*/
 }
 
 LUALIB_API void tolua_variable(lua_State* L, const char* name, lua_CFunction get, lua_CFunction set)
@@ -1089,7 +1272,8 @@ LUALIB_API void tolua_variable(lua_State* L, const char* name, lua_CFunction get
     }
 
     lua_pushstring(L, name);
-    lua_pushcfunction(L, get);
+    //lua_pushcfunction(L, get);
+    tolua_pushcclosure(L, get);
     lua_rawset(L, -3);                  /* store variable */
     lua_pop(L, 1);                      /* pop .get table */
 
@@ -1110,7 +1294,8 @@ LUALIB_API void tolua_variable(lua_State* L, const char* name, lua_CFunction get
         }
 
         lua_pushstring(L, name);
-        lua_pushcfunction(L, set);
+        //lua_pushcfunction(L, set);
+        tolua_pushcclosure(L, set);
         lua_rawset(L, -3);                  /* store variable */
         lua_pop(L, 1);                      /* pop .set table */
     }
@@ -1329,6 +1514,12 @@ static int traceback(lua_State *L)
     }
     else 
     {
+        if (NULL != strstr(msg, "stack traceback:"))
+        {
+            lua_pushvalue(L, arg + 1);
+            return 1;
+        }
+
         int level = (int)luaL_optinteger(L, arg + 2, (L == L1) ? 1 : 0);
 #ifdef LUAJIT_VERSION            
         luaL_traceback(L, L1, msg, level);
@@ -1414,7 +1605,7 @@ static int do_operator (lua_State* L, const char* op)
     return 0;
 }
 
-static int class_add_event (lua_State* L)
+/*static int class_add_event (lua_State* L)
 {
     return do_operator(L,"op_Addition");
 }
@@ -1437,7 +1628,7 @@ static int class_div_event (lua_State* L)
 static int class_equals_event (lua_State* L)
 {
     return do_operator(L,"op_Equality");
-}
+}*/
 
 
 #ifdef _WIN32
@@ -1755,7 +1946,7 @@ static int _int64pow(lua_State* L)
     else
     {
         char temp[64];
-        sprintf(temp, "%"PRId64, rhs);    
+        sprintf(temp, "%" PRId64, rhs);    
         return luaL_error(L, "pow by nagtive number %s", temp);
     }
 
@@ -1804,7 +1995,7 @@ static int _int64tostring(lua_State* L)
 
     int64_t n = tolua_toint64(L, 1);    
     char temp[64];
-    sprintf(temp, "%"PRId64, n);    
+    sprintf(temp, "%" PRId64, n);    
     lua_pushstring(L, temp);
     return 1;
 }
@@ -1834,7 +2025,7 @@ static int _int64tonum2(lua_State* L)
     return 2;
 }
 
-static int _int64tofixed(lua_State* L)
+/*static int _int64tofixed(lua_State* L)
 {
     int64_t n = *(int64_t*)lua_touserdata(L, 1);    
     lua_pushlstring(L, (char*)&n, 8);
@@ -1862,7 +2053,7 @@ static int _int64fromfixed(lua_State* L)
         
     *n = (int64_t)n64;
     return 1;
-}
+}*/
 
 static int _int64new(lua_State* L)
 {
@@ -2169,16 +2360,22 @@ void tolua_openlualayermask(lua_State* L)
     lua_pop(L, 1);
 }
 
-LUALIB_API int tolua_openlualibs(lua_State* L)
+static int _openlualibs(lua_State* L)
 {
-	tolua_openvaluetype(L);
-	tolua_openluavec3(L);
-	tolua_openluavec2(L);
-	tolua_openluavec4(L);
-	tolua_openluaclr(L);
-	tolua_openluaquat(L);   
+    tolua_openvaluetype(L);
+    tolua_openluavec3(L);
+    tolua_openluavec2(L);
+    tolua_openluavec4(L);
+    tolua_openluaclr(L);
+    tolua_openluaquat(L);   
     tolua_openlualayermask(L);
     return 0;
+}
+
+LUALIB_API int tolua_openlualibs(lua_State* L)
+{    
+    lua_pushcfunction(L, _openlualibs);
+    return lua_pcall(L, 0, -1, 0);    
 }
 
 static int mathf_ispoweroftwo(lua_State* L)
@@ -2189,7 +2386,7 @@ static int mathf_ispoweroftwo(lua_State* L)
     return 1;
 }
 
-inline lua_Integer NextPowerOfTwo(lua_Integer v)
+lua_Integer NextPowerOfTwo(lua_Integer v)
 {
     v -= 1;
     v |= v >> 16;
@@ -2204,7 +2401,7 @@ static int mathf_nextpoweroftwo(lua_State* L)
 {
     lua_Integer v = luaL_checkinteger(L, 1);
     v = NextPowerOfTwo(v);
-    lua_pushinteger(L, v);
+    lua_pushnumber(L, v);
     return 1;
 }
 
@@ -2216,11 +2413,11 @@ static int mathf_closestpoweroftwo(lua_State* L)
 
     if (v - prevPower < nextPower - v)
     {
-        lua_pushinteger(L, prevPower);        
+        lua_pushnumber(L, prevPower);        
     }
     else
     {    
-        lua_pushinteger(L, nextPower);
+        lua_pushnumber(L, nextPower);
     }
 
     return 1;

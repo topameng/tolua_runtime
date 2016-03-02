@@ -24,6 +24,9 @@ gcc -m32 -O3 -std=gnu99 -shared \
 	pb.c \
 	lpeg.c \
 	struct.c \
+	cjson/strbuf.c \
+	cjson/lua_cjson.c \
+	cjson/fpconv.c \
 	luasocket/auxiliar.c \
 	luasocket/buffer.c \
 	luasocket/except.c \
@@ -41,6 +44,7 @@ gcc -m32 -O3 -std=gnu99 -shared \
 	-o Plugins/x86/tolua.dll \
 	-I./ \
 	-Iluajit/src \
+	-Icjson \
 	-Iluasocket \
 	-lws2_32 \
 	-Wl,--whole-archive window/x86/libluajit.a -Wl,--no-whole-archive -static-libgcc -static-libstdc++
