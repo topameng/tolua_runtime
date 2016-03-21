@@ -31,6 +31,7 @@
 		847D0E1E1C54CA3400A49E91 /* unix.c in Sources */ = {isa = PBXBuildFile; fileRef = 847D0E0A1C54CA3400A49E91 /* unix.c */; };
 		847D0E1F1C54CA3400A49E91 /* usocket.c in Sources */ = {isa = PBXBuildFile; fileRef = 847D0E0C1C54CA3400A49E91 /* usocket.c */; };
 		847D0E251C54CA7000A49E91 /* libluajit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 847D0E241C54CA7000A49E91 /* libluajit.a */; };
+		849CC46D1C98477900D4D510 /* int64.c in Sources */ = {isa = PBXBuildFile; fileRef = 849CC46C1C98477900D4D510 /* int64.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -89,6 +90,7 @@
 		847D0E0C1C54CA3400A49E91 /* usocket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = usocket.c; sourceTree = "<group>"; };
 		847D0E0D1C54CA3400A49E91 /* usocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = usocket.h; sourceTree = "<group>"; };
 		847D0E241C54CA7000A49E91 /* libluajit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libluajit.a; sourceTree = "<group>"; };
+		849CC46C1C98477900D4D510 /* int64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = int64.c; path = ../../int64.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,9 +141,10 @@
 				842A59AD1C85B87E00EA2815 /* cjson */,
 				847D0DED1C54CA3400A49E91 /* luasocket */,
 				847D0DE91C54CA2500A49E91 /* lpeg.c */,
-				847D0DE51C54CA0700A49E91 /* tolua.c */,
-				847D0DEB1C54CA2C00A49E91 /* pb.c */,
 				847D0DE71C54CA1F00A49E91 /* struct.c */,
+				847D0DEB1C54CA2C00A49E91 /* pb.c */,
+				849CC46C1C98477900D4D510 /* int64.c */,
+				847D0DE51C54CA0700A49E91 /* tolua.c */,
 			);
 			path = tolua;
 			sourceTree = "<group>";
@@ -263,6 +266,7 @@
 				847D0E1E1C54CA3400A49E91 /* unix.c in Sources */,
 				847D0E1B1C54CA3400A49E91 /* tcp.c in Sources */,
 				847D0DEA1C54CA2500A49E91 /* lpeg.c in Sources */,
+				849CC46D1C98477900D4D510 /* int64.c in Sources */,
 				847D0E151C54CA3400A49E91 /* luasocket.c in Sources */,
 				847D0E1C1C54CA3400A49E91 /* timeout.c in Sources */,
 			);

@@ -1,12 +1,4 @@
 #!/bin/bash
-#
-# Windows 32-bit/64-bit
-
-# Copyright (C) polynation games ltd - All Rights Reserved
-# Unauthorized copying of this file, via any medium is strictly prohibited
-# Proprietary and confidential
-# Written by Christopher Redden, December 2013
-
 # 62 Bit Version
 mkdir -p window/x86_64
 
@@ -19,7 +11,9 @@ mingw32-make clean
 
 cd ..
 
-gcc tolua.c \
+gcc -m64 -O3 -std=gnu99 -shared \
+ tolua.c \
+ int64.c \
  pb.c \
  lpeg.c \
  struct.c \
@@ -41,7 +35,6 @@ gcc tolua.c \
  luasocket/udp.c \
  luasocket/wsocket.c \
  -o Plugins/x86_64/tolua.dll \
- -m64 -O3 -std=gnu99 -shared \
  -I./ \
  -Iluajit/src \
  -Iluasocket \

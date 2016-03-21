@@ -1,12 +1,4 @@
 #!/bin/bash
-#
-# Windows 32-bit/64-bit
-
-# Copyright (C) polynation games ltd - All Rights Reserved
-# Unauthorized copying of this file, via any medium is strictly prohibited
-# Proprietary and confidential
-# Written by Christopher Redden, December 2013
-
 # 32 Bit Version
 mkdir -p window/x86
 
@@ -20,6 +12,7 @@ mingw32-make clean
 cd ..
 
 gcc -m32 -O3 -std=gnu99 -shared \
+	int64.c \
 	tolua.c \
 	pb.c \
 	lpeg.c \

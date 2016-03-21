@@ -10,6 +10,7 @@
 		842A59A91C85B76100EA2815 /* fpconv.c in Sources */ = {isa = PBXBuildFile; fileRef = 842A59A31C85B76100EA2815 /* fpconv.c */; };
 		842A59AA1C85B76100EA2815 /* lua_cjson.c in Sources */ = {isa = PBXBuildFile; fileRef = 842A59A51C85B76100EA2815 /* lua_cjson.c */; };
 		842A59AB1C85B76100EA2815 /* strbuf.c in Sources */ = {isa = PBXBuildFile; fileRef = 842A59A61C85B76100EA2815 /* strbuf.c */; };
+		849CC46B1C9846C800D4D510 /* int64.c in Sources */ = {isa = PBXBuildFile; fileRef = 849CC46A1C9846C800D4D510 /* int64.c */; };
 		84ED5C081C4D0749006965FF /* bit.c in Sources */ = {isa = PBXBuildFile; fileRef = 84ED5C071C4D0749006965FF /* bit.c */; };
 		84EF238C1C4CCD3F0093A49A /* lapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 84EF23551C4CCD3F0093A49A /* lapi.c */; };
 		84EF238D1C4CCD3F0093A49A /* lauxlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 84EF23571C4CCD3F0093A49A /* lauxlib.c */; };
@@ -74,6 +75,7 @@
 		842A59A51C85B76100EA2815 /* lua_cjson.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lua_cjson.c; sourceTree = "<group>"; };
 		842A59A61C85B76100EA2815 /* strbuf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = strbuf.c; sourceTree = "<group>"; };
 		842A59A71C85B76100EA2815 /* strbuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strbuf.h; sourceTree = "<group>"; };
+		849CC46A1C9846C800D4D510 /* int64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = int64.c; path = ../../int64.c; sourceTree = "<group>"; };
 		84ED5C071C4D0749006965FF /* bit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bit.c; path = ../../bit.c; sourceTree = "<group>"; };
 		84EF23551C4CCD3F0093A49A /* lapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lapi.c; sourceTree = "<group>"; };
 		84EF23561C4CCD3F0093A49A /* lapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lapi.h; sourceTree = "<group>"; };
@@ -203,9 +205,10 @@
 				84F8B8B81C4567C100AE9B8F /* luasocket */,
 				84F8B8B61C45679C00AE9B8F /* lpeg.c */,
 				84ED5C071C4D0749006965FF /* bit.c */,
-				84F8B8B21C45678E00AE9B8F /* tolua.c */,
 				84F8B8B41C45679700AE9B8F /* struct.c */,
 				84F8B8B01C45677A00AE9B8F /* pb.c */,
+				849CC46A1C9846C800D4D510 /* int64.c */,
+				84F8B8B21C45678E00AE9B8F /* tolua.c */,
 				0F4B04D61800959F002EA938 /* Supporting Files */,
 			);
 			path = tolua;
@@ -409,6 +412,7 @@
 				84EF23981C4CCD3F0093A49A /* llex.c in Sources */,
 				84F8B8DB1C4567C100AE9B8F /* auxiliar.c in Sources */,
 				84F8B8B71C45679C00AE9B8F /* lpeg.c in Sources */,
+				849CC46B1C9846C800D4D510 /* int64.c in Sources */,
 				84EF23A21C4CCD3F0093A49A /* lstrlib.c in Sources */,
 				84EF23AB1C4CCD3F0093A49A /* print.c in Sources */,
 				84F8B8E51C4567C100AE9B8F /* serial.c in Sources */,

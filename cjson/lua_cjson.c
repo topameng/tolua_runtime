@@ -222,7 +222,7 @@ static int json_integer_option(lua_State *l, int optindex, int *setting,
     int value;
 
     if (!lua_isnil(l, optindex)) {
-        value = luaL_checkinteger(l, optindex);
+        value = (int)luaL_checkinteger(l, optindex);
         snprintf(errmsg, sizeof(errmsg), "expected integer between %d and %d", min, max);
         luaL_argcheck(l, min <= value && value <= max, 1, errmsg);
         *setting = value;
