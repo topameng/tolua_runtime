@@ -347,7 +347,7 @@ int tolua_newint64(lua_State* L)
             return luaL_error(L, "#1 out of range: %" PRId64, n1);
         }
 
-        if (n1 < 0 || n1 > 4294967295)
+        if (n2 < 0 || n2 > 4294967295)
         {
             return luaL_error(L, "#2 out of range: %" PRId64, n2);
         }
