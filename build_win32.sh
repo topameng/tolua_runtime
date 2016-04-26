@@ -26,7 +26,6 @@ gcc -m32 -O3 -std=gnu99 -shared \
 	luasocket/inet.c \
 	luasocket/io.c \
 	luasocket/luasocket.c \
-	luasocket/luasocket_scripts.c \
 	luasocket/mime.c \
 	luasocket/options.c \
 	luasocket/select.c \
@@ -34,6 +33,7 @@ gcc -m32 -O3 -std=gnu99 -shared \
 	luasocket/timeout.c \
 	luasocket/udp.c \
 	luasocket/wsocket.c \
+	luasocket/compat.c \
 	-o Plugins/x86/tolua.dll \
 	-I./ \
 	-Iluajit/src \

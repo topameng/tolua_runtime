@@ -27,14 +27,14 @@ LOCAL_SRC_FILES :=	../../tolua.c \
  					../../luasocket/inet.c \
  					../../luasocket/io.c \
  					../../luasocket/luasocket.c \
- 					../../luasocket/luasocket_scripts.c \
-					../../luasocket/mime.c \
+ 					../../luasocket/mime.c \
  					../../luasocket/options.c \
  					../../luasocket/select.c \
  					../../luasocket/tcp.c \
  					../../luasocket/timeout.c \
  					../../luasocket/udp.c \
  					../../luasocket/usocket.c \
+ 					../../luasocket/compat.c \
 
 LOCAL_WHOLE_STATIC_LIBRARIES += libluajit
 include $(BUILD_SHARED_LIBRARY)

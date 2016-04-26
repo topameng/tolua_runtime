@@ -17,7 +17,7 @@
 \*=========================================================================*/
 #include "lua.h"
 #include "lauxlib.h"
-
+#include "compat.h"
 
 /*=========================================================================*\
 * LuaSocket includes
@@ -64,7 +64,7 @@ static luaL_Reg func[] = {
 * Skip a few arguments
 \*-------------------------------------------------------------------------*/
 static int global_skip(lua_State *L) {
-    int amount = luaL_checkint(L, 1);
+    int amount = luaL_checkinteger(L, 1);
     int ret = lua_gettop(L) - amount - 1;
     return ret >= 0 ? ret : 0;
 }
@@ -78,26 +78,14 @@ static int global_unload(lua_State *L) {
     return 0;
 }
 
-#if LUA_VERSION_NUM > 501
-int luaL_typerror (lua_State *L, int narg, const char *tname) {
-  const char *msg = lua_pushfstring(L, "%s expected, got %s",
-                                    tname, luaL_typename(L, narg));
-  return luaL_argerror(L, narg, msg);
-}
-#endif
-
 /*-------------------------------------------------------------------------*\
 * Setup basic stuff.
 \*-------------------------------------------------------------------------*/
 static int base_open(lua_State *L) {
     if (socket_open()) {
         /* export functions (and leave namespace table on top of stack) */
-#if LUA_VERSION_NUM > 501 && !defined(LUA_COMPAT_MODULE)
         lua_newtable(L);
         luaL_setfuncs(L, func, 0);
-#else
-        luaL_openlib(L, "socket", func, 0);
-#endif
 #ifdef LUASOCKET_DEBUG
         lua_pushstring(L, "_DEBUG");
         lua_pushboolean(L, 1);

@@ -399,8 +399,9 @@ static int lj_cf_package_require(lua_State *L)
   const char *name = luaL_checkstring(L, 1);
   int i;
   lua_settop(L, 1);  /* _LOADED table will be at index 2 */
+  const char* key = luaL_gsub(L, name, "/", ".");
   lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED");
-  lua_getfield(L, 2, name);
+  lua_getfield(L, 3, key);
   if (lua_toboolean(L, -1)) {  /* is it there? */
     if (lua_touserdata(L, -1) == sentinel)  /* check loops */
       luaL_error(L, "loop or previous error loading module " LUA_QS, name);
@@ -426,16 +427,16 @@ static int lj_cf_package_require(lua_State *L)
       lua_pop(L, 1);
   }
   lua_pushlightuserdata(L, sentinel);
-  lua_setfield(L, 2, name);  /* _LOADED[name] = sentinel */
+  lua_setfield(L, 3, key);  /* _LOADED[name] = sentinel */
   lua_pushstring(L, name);  /* pass name as argument to module */
   lua_call(L, 1, 1);  /* run loaded module */
   if (!lua_isnil(L, -1))  /* non-nil return? */
-    lua_setfield(L, 2, name);  /* _LOADED[name] = returned value */
-  lua_getfield(L, 2, name);
+    lua_setfield(L, 3, key);  /* _LOADED[name] = returned value */
+  lua_getfield(L, 3, key);
   if (lua_touserdata(L, -1) == sentinel) {   /* module did not set a value? */
     lua_pushboolean(L, 1);  /* use true as result */
     lua_pushvalue(L, -1);  /* extra copy to be returned */
-    lua_setfield(L, 2, name);  /* _LOADED[name] = true */
+    lua_setfield(L, 3, key);  /* _LOADED[name] = true */
   }
   lj_lib_checkfpu(L);
   return 1;
@@ -482,16 +483,17 @@ static void modinit(lua_State *L, const char *modname)
 static int lj_cf_package_module(lua_State *L)
 {
   const char *modname = luaL_checkstring(L, 1);
+  const char *key = luaL_gsub(L, modname, "/", ".");
   int loaded = lua_gettop(L) + 1;  /* index of _LOADED table */
   lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED");
-  lua_getfield(L, loaded, modname);  /* get _LOADED[modname] */
+  lua_getfield(L, loaded, key);  /* get _LOADED[modname] */
   if (!lua_istable(L, -1)) {  /* not found? */
     lua_pop(L, 1);  /* remove previous result */
     /* try global variable (and create one if it does not exist) */
     if (luaL_findtable(L, LUA_GLOBALSINDEX, modname, 1) != NULL)
       lj_err_callerv(L, LJ_ERR_BADMODN, modname);
     lua_pushvalue(L, -1);
-    lua_setfield(L, loaded, modname);  /* _LOADED[modname] = new table */
+    lua_setfield(L, loaded, key);  /* _LOADED[modname] = new table */
   }
   /* check whether table already has a _NAME field */
   lua_getfield(L, -1, "_NAME");
@@ -503,7 +505,7 @@ static int lj_cf_package_module(lua_State *L)
   }
   lua_pushvalue(L, -1);
   setfenv(L);
-  dooptions(L, loaded - 1);
+  dooptions(L, loaded - 2);
   return 0;
 }
 

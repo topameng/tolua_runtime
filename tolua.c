@@ -254,10 +254,10 @@ LUA_API void* tolua_newuserdata(lua_State* L, int sz)
     return lua_newuserdata(L, (size_t)sz);    
 }
 
-LUA_API int32_t tolua_objlen(lua_State* L, int idx)
+LUA_API int tolua_objlen(lua_State* L, int idx)
 {
     size_t len = lua_objlen(L, idx);
-    return (int32_t)len;
+    return (int)len;
 }
 
 LUA_API bool tolua_toboolean(lua_State* L, int idx) 
@@ -853,7 +853,12 @@ static int static_index_event(lua_State* L)
     }
     
     lua_settop(L, 2);
-    luaL_error(L, "field or property %s does not exist", lua_tostring(L, 2));    
+    
+    if (toluaflags & FLAG_INDEX_ERROR)
+    {
+        luaL_error(L, "field or property %s does not exist", lua_tostring(L, 2));    
+    }
+
     return 1;
 }
 
@@ -1504,14 +1509,106 @@ LUALIB_API void tolua_pushtraceback(lua_State* L)
 	lua_pushcfunction(L, traceback);
 }
 
+/*static const int sentinel_ = 0;
+#define sentinel ((void *)&sentinel_)
+
+static int _require(lua_State* L)
+{
+    const char* name = luaL_checkstring(L, 1);    
+    lua_settop(L, 1);  
+    const char* key = luaL_gsub(L, name, "/", ".");            
+    lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED");
+    lua_getfield(L, 3, key);
+
+    if (lua_toboolean(L, -1)) 
+    {  
+        if (lua_touserdata(L, -1) == sentinel)  
+        {
+            luaL_error(L, "loop or previous error loading module " LUA_QS, name);
+        }
+
+        return 1;  //package is already loaded
+    }
+
+    // else must load it; iterate over available loaders
+    lua_getfield(L, LUA_ENVIRONINDEX, "loaders");
+
+    if (!lua_istable(L, -1))
+    {
+        luaL_error(L, LUA_QL("package.loaders") " must be a table");
+    }
+
+    lua_pushliteral(L, "");  //error message accumulator
+
+    for(int i = 1; ; i++) 
+    {
+        lua_rawgeti(L, -2, i);  // get a loader
+
+        if (lua_isnil(L, -1))
+        {
+            luaL_error(L, "module " LUA_QS " not found:%s", name, lua_tostring(L, -2));
+        }
+
+        lua_pushstring(L, name);
+        lua_call(L, 1, 1);  
+
+        if (lua_isfunction(L, -1))  // did it find module?
+        {
+            break;  // module loaded successfully
+        }
+        else if (lua_isstring(L, -1))  // loader returned error message?
+        {
+            lua_concat(L, 2);  // accumulate it
+        }
+        else
+        {
+            lua_pop(L, 1);            
+        }    
+    }
+
+    lua_pushlightuserdata(L, sentinel);
+    lua_setfield(L, 3, key);   // _LOADED[name] = sentinel
+    lua_pushstring(L, name);    // pass name as argument to module
+    lua_call(L, 1, 1);          // run loaded module
+
+    if (!lua_isnil(L, -1))  // non-nil return? 
+    {
+        lua_setfield(L, 3, key);  // _LOADED[name] = returned value
+    }
+
+    lua_getfield(L, 3, key);
+
+    if (lua_touserdata(L, -1) == sentinel) 
+    {   // module did not set a value? 
+        lua_pushboolean(L, 1);          // use true as result
+        lua_pushvalue(L, -1);           // extra copy to be returned
+        lua_setfield(L, 3, key);        // _LOADED[name] = true 
+    }
+
+    return 1;
+}
+
+void tolua_openrequire(lua_State* L)
+{    
+    lua_getglobal(L, "require");
+    lua_pushcfunction(L, _require);
+    lua_getfenv(L, -2);
+    lua_setfenv(L, -2);
+    lua_setglobal(L, "require");
+    lua_pop(L, 1);
+}*/
+
 LUALIB_API int tolua_require(lua_State* L, const char* fileName)
 {
     int top = lua_gettop(L);
-    lua_pushcfunction(L, traceback);    
+    lua_pushcfunction(L, traceback);       
     lua_getref(L, LUA_RIDX_REQUIRE);
-    lua_pushstring(L, fileName);    
-    return lua_pcall(L, 1, -1, top + 1);
+    lua_pushstring(L, fileName);        
+    int ret = lua_pcall(L, 1, -1, top + 1);
+    lua_remove(L, top + 1);    
+    return ret;
 }
+
 
 /*LUALIB_API bool tolua_checkluaslot(lua_State* L, int stackPos, int* func, int* table)
 {
@@ -1832,7 +1929,7 @@ void tolua_openluavec3(lua_State* L)
 
     if (!lua_istable(L, 1))
     {        
-        luaL_error(L, "Vector3 not exists or loaded");
+        luaL_error(L, "Vector3 does not exist or not be loaded");
         return;
     }
 
@@ -1851,7 +1948,7 @@ void tolua_openluavec2(lua_State* L)
 
     if (!lua_istable(L, 1))
     {        
-        luaL_error(L, "Vector2 not exists or loaded");
+        luaL_error(L, "Vector2 does not exist or not be loaded");
         return;
     }
 
@@ -1870,7 +1967,7 @@ void tolua_openluavec4(lua_State* L)
 
     if (!lua_istable(L, 1))
     {        
-        luaL_error(L, "Vector4 not exists or loaded");
+        luaL_error(L, "Vector4 does not exist or not be loaded");
         return;
     }
 
@@ -1889,7 +1986,7 @@ void tolua_openluaclr(lua_State* L)
 
     if (!lua_istable(L, 1))
     {        
-        luaL_error(L, "Color not exists or loaded");
+        luaL_error(L, "Color does not exist or not be loaded");
         return;
     }
 
@@ -1908,7 +2005,7 @@ void tolua_openluaquat(lua_State* L)
 
     if (!lua_istable(L, 1))
     {        
-        luaL_error(L, "Quaternion not exists or loaded");
+        luaL_error(L, "Quaternion does not exist or not be loaded");
         return;
     }
 
@@ -1927,7 +2024,7 @@ void tolua_openlualayermask(lua_State* L)
 
     if (!lua_istable(L, 1))
     {        
-        luaL_error(L, "LayerMask not exists or loaded");
+        luaL_error(L, "LayerMask does not exist or not be loaded");
         return;
     }
 
@@ -1946,7 +2043,7 @@ void tolua_openupdate(lua_State* L)
 
     if (!lua_isfunction(L, 1))
     {
-        luaL_error(L, "Update function not exists");
+        luaL_error(L, "Update function does not exist or not be loaded");
         return;
     }
 
@@ -1955,7 +2052,7 @@ void tolua_openupdate(lua_State* L)
 
     if (!lua_isfunction(L, 1))
     {
-        luaL_error(L, "LateUpdate function not exists");
+        luaL_error(L, "LateUpdate function does not exist or not be loaded");
         return;
     }
 
@@ -1964,7 +2061,7 @@ void tolua_openupdate(lua_State* L)
 
     if (!lua_isfunction(L, 1))
     {
-        luaL_error(L, "FixedUpdate function not exists");
+        luaL_error(L, "FixedUpdate function does not exist or not be loaded");
         return;
     }
 
@@ -2135,6 +2232,7 @@ LUALIB_API void tolua_openlibs(lua_State* L)
     tolua_openfixedmap(L);    
     tolua_openint64(L);
     tolua_openvptr(L);
+    //tolua_openrequire(L);
 
     luaL_register(L, "Mathf", tolua_mathf);     
     luaL_register(L, "tolua", tolua_funcs);    
@@ -2150,7 +2248,7 @@ LUALIB_API void tolua_openlibs(lua_State* L)
     lua_rawset(L, -3);
 
     lua_pushstring(L, "version");
-    lua_pushstring(L, "1.0.4");
+    lua_pushstring(L, "1.0.5");
     lua_rawset(L, -3);
 
     lua_settop(L,top);
@@ -2285,8 +2383,3 @@ LUALIB_API void tolua_regthis(lua_State* L, lua_CFunction get, lua_CFunction set
     lua_pushcfunction(L, newindex_op_this);
     lua_rawset(L, -3);          
 }
-
-
-
-
-

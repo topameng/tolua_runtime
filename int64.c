@@ -42,6 +42,19 @@ SOFTWARE.
 #include <sys/time.h>
 #endif
 
+static bool _isint64(lua_State* L, int pos)
+{
+    if (lua_getmetatable(L, pos))
+    {            
+        lua_getref(L, LUA_RIDX_INT64); 
+        int equal = lua_rawequal(L, -1, -2);
+        lua_pop(L, 2);  
+        return equal;
+    }
+    
+    return false;
+}
+
 LUALIB_API bool tolua_isint64(lua_State* L, int pos)
 {
     if (lua_type(L, pos) == LUA_TNUMBER)
@@ -49,24 +62,7 @@ LUALIB_API bool tolua_isint64(lua_State* L, int pos)
         return true;
     }
 
-    int64_t* p = (int64_t*)lua_touserdata(L, pos);
-
-    if (p != NULL)
-    {
-        if (lua_getmetatable(L, pos))
-        {            
-            lua_getref(L, LUA_RIDX_INT64); 
-            int equal = lua_rawequal(L, -1, -2);
-            lua_pop(L, 2);  
-
-            if (equal)  
-            {
-                return true;
-            }
-        }
-    }
-
-    return false;
+    return _isint64(L, pos);
 }
 
 LUALIB_API void tolua_pushint64(lua_State* L, int64_t n)
@@ -84,6 +80,7 @@ LUALIB_API void tolua_pushint64(lua_State* L, int64_t n)
     }
 }
 
+//转换一个字符串为 int64
 static int64_t _long(lua_State* L, int pos)
 {
     int old = errno;   
@@ -115,7 +112,10 @@ LUALIB_API int64_t tolua_toint64(lua_State* L, int pos)
             n = _long(L, pos);
             break;
         case LUA_TUSERDATA:     
-            n = *(int64_t*)lua_touserdata(L, pos);            
+            if (_isint64(L, pos))
+            {
+                n = *(int64_t*)lua_touserdata(L, pos);            
+            }
             break;    
         default:        
             break;
@@ -138,7 +138,10 @@ static int64_t tolua_checkint64(lua_State* L, int pos)
             n = _long(L, pos);
             break;
         case LUA_TUSERDATA:
-            n = *(int64_t*)lua_touserdata(L, pos);
+            if (_isint64(L, pos))
+            {
+                n = *(int64_t*)lua_touserdata(L, pos);
+            }
             break;
         default:
             return luaL_typerror(L, pos, "int64");
@@ -298,36 +301,6 @@ static int _int64tonum2(lua_State* L)
     return 2;
 }
 
-/*static int _int64tofixed(lua_State* L)
-{
-    int64_t n = *(int64_t*)lua_touserdata(L, 1);    
-    lua_pushlstring(L, (char*)&n, 8);
-    return 1;
-}
-
-static int _int64fromfixed(lua_State* L)
-{
-    int64_t* n = (int64_t*)lua_touserdata(L, 1);    
-    size_t len = 0;
-    const char* str = lua_tolstring(L, 2, &len);
-
-    if (len > 8) 
-    {
-        return luaL_error(L, "The string (length = %d) is not an fixed64 string", len);
-    }
-
-    int i = 0;
-    uint64_t n64 = 0;
-
-    for (i=0; i < len; i++) 
-    {
-        n64 |= (uint64_t)(str[i] << (i*8));
-    }
-        
-    *n = (int64_t)n64;
-    return 1;
-}*/
-
 int tolua_newint64(lua_State* L)
 {
     int64_t n = 0;
@@ -428,15 +401,7 @@ void tolua_openint64(lua_State* L)
 
     lua_pushstring(L, "tonum2");
     lua_pushcfunction(L, _int64tonum2);
-    lua_rawset(L, -3);       
-
-    /*lua_pushstring(L, "tofixed");
-    lua_pushcfunction(L, _int64tofixed);
-    lua_rawset(L, -3);  
-
-    lua_pushstring(L, "fromfixed");
-    lua_pushcfunction(L, _int64fromfixed);
-    lua_rawset(L, -3);*/     
+    lua_rawset(L, -3);        
 
     lua_pushstring(L, "__index");
     lua_pushvalue(L, -2);
