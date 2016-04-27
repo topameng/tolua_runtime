@@ -9,3 +9,9 @@ ios: build_ios.sh (xcode + luajit2.1 beta) <br>
 https://github.com/mpx/lua-cjson<br>
 **protoc-gen-lua**<br>
 https://github.com/topameng/protoc-gen-lua<br>
+**LuaSocket** <br>
+https://github.com/diegonehab/luasocket
+**struct**<br>
+http://www.inf.puc-rio.br/~roberto/struct/
+**lpeg**<br>
+http://www.inf.puc-rio.br/~roberto/lpeg/lpeg.html
