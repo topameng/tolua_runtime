@@ -12,8 +12,8 @@ https://github.com/mpx/lua-cjson<br>
 **protoc-gen-lua**<br>
 https://github.com/topameng/protoc-gen-lua<br>
 **LuaSocket** <br>
-https://github.com/diegonehab/luasocket
+https://github.com/diegonehab/luasocket<br>
 **struct**<br>
-http://www.inf.puc-rio.br/~roberto/struct/
+http://www.inf.puc-rio.br/~roberto/struct/<br>
 **lpeg**<br>
 http://www.inf.puc-rio.br/~roberto/lpeg/lpeg.html
