@@ -36,11 +36,11 @@ SOFTWARE.
 #include "lauxlib.h"
 #include "tolua.h"
 
-static bool _isint64(lua_State* L, int pos)
+static bool _isuint64(lua_State *L, int pos)
 {
     if (lua_getmetatable(L, pos))
     {            
-        lua_getref(L, LUA_RIDX_INT64); 
+        lua_getref(L, LUA_RIDX_UINT64); 
         int equal = lua_rawequal(L, -1, -2);
         lua_pop(L, 2);  
         return equal;
@@ -49,10 +49,10 @@ static bool _isint64(lua_State* L, int pos)
     return false;
 }
 
-bool _str2long(const char *s, int64_t* result) 
+bool _str2ulong(const char *s, uint64_t* result) 
 {
     char *endptr;
-    *result = strtoll(s, &endptr, 10);
+    *result = strtoull(s, &endptr, 10);
 
     if (endptr == s)
     {
@@ -61,7 +61,7 @@ bool _str2long(const char *s, int64_t* result)
 
     if (*endptr == 'x' || *endptr == 'X')
     {
-        *result = (int64_t)strtoull(s, &endptr, 16);
+        *result = strtoull(s, &endptr, 16);
     }
 
     if (*endptr == '\0') 
@@ -73,48 +73,48 @@ bool _str2long(const char *s, int64_t* result)
     return *endptr == '\0';
 }
 
-LUALIB_API bool tolua_isint64(lua_State* L, int pos)
+LUALIB_API bool tolua_isuint64(lua_State *L, int pos)
 {
-    int64_t num;
+    uint64_t num = 0;
 
     if (lua_type(L, pos) == LUA_TNUMBER)
     {
         return true;
     }
-    else if (lua_type(L, pos) == LUA_TSTRING && _str2long(lua_tostring(L, pos), &num))
+    else if (lua_type(L, pos) == LUA_TSTRING && _str2ulong(lua_tostring(L, pos), &num))
     {
         return true;
     }
 
-    return _isint64(L, pos);
+    return _isuint64(L, pos);
 }
 
-LUALIB_API void tolua_pushint64(lua_State* L, int64_t n)
+LUALIB_API void tolua_pushuint64(lua_State *L, uint64_t n)
 {
-    if (toluaflags & FLAG_INT64)    
+    if (toluaflags & FLAG_UINT64)    
     {
         lua_pushinteger(L, (lua_Integer)n);
     }
     else
     {
-        int64_t* p = (int64_t*)lua_newuserdata(L, sizeof(int64_t));
+        uint64_t* p = (uint64_t*)lua_newuserdata(L, sizeof(uint64_t));
         *p = n;
-        lua_getref(L, LUA_RIDX_INT64);
+        lua_getref(L, LUA_RIDX_UINT64);
         lua_setmetatable(L, -2);            
     }
 }
 
-//转换一个字符串为 int64
-static int64_t _long(lua_State* L, int pos)
+//转换一个字符串为 uint64
+static uint64_t _ulong(lua_State *L, int pos)
 {
-    int64_t n = 0;
+    uint64_t n = 0;
     int old = errno;   
     errno = 0;
-    const char* str = lua_tostring(L, pos);
+    const char *str = lua_tostring(L, pos);
 
-    if (!_str2long(str, &n))
+    if (!_str2ulong(str, &n))
     {
-        luaL_typerror(L, pos, "long");
+        luaL_typerror(L, pos, "ulong");
     }
 
     if (errno == ERANGE)
@@ -123,29 +123,30 @@ static int64_t _long(lua_State* L, int pos)
         return luaL_error(L, "integral is too large: %s", str);
     }  
 
+    errno = old;
     return n;
 }
 
-LUALIB_API int64_t tolua_toint64(lua_State* L, int pos)
+LUALIB_API uint64_t tolua_touint64(lua_State *L, int pos)
 {
-    int64_t n = 0;
+    uint64_t n = 0;
     int type = lua_type(L, pos);
 
     switch(type) 
     {
         case LUA_TNUMBER:         
-            n = (int64_t)lua_tonumber(L, pos);        
+            n = (uint64_t)lua_tonumber(L, pos);        
             break;    
         case LUA_TSTRING: 
-            if (!_str2long(lua_tostring(L, pos), &n))
+            if (!_str2ulong(lua_tostring(L, pos), &n))
             {
                 n = 0;
-            }
+            }            
             break;
         case LUA_TUSERDATA:     
-            if (_isint64(L, pos))
+            if (_isuint64(L, pos))
             {
-                n = *(int64_t*)lua_touserdata(L, pos);            
+                n = *(uint64_t*)lua_touserdata(L, pos);            
             }
             break;    
         default:        
@@ -155,91 +156,90 @@ LUALIB_API int64_t tolua_toint64(lua_State* L, int pos)
     return n;
 }
 
-static int64_t tolua_checkint64(lua_State* L, int pos)
+static uint64_t tolua_checkuint64(lua_State *L, int pos)
 {
-    int64_t n = 0;
+    uint64_t n = 0;
     int type = lua_type(L, pos);
     
     switch(type)
     {
         case LUA_TNUMBER:
-            n = (int64_t)lua_tonumber(L, pos);
+            n = (uint64_t)lua_tonumber(L, pos);
             break;
         case LUA_TSTRING:
-            n = _long(L, pos);
+            n = _ulong(L, pos);
             break;
         case LUA_TUSERDATA:
-            if (_isint64(L, pos))
+            if (_isuint64(L, pos))
             {
-                n = *(int64_t*)lua_touserdata(L, pos);
+                n = *(uint64_t*)lua_touserdata(L, pos);
             }
             break;
         default:
-            return luaL_typerror(L, pos, "long");
+            return luaL_typerror(L, pos, "ulong");
     }
     
     return n;
 }
 
-static int _int64add(lua_State* L)
+static int _uint64add(lua_State *L)
 {
-    int64_t lhs = *(int64_t*)lua_touserdata(L, 1);    
-    int64_t rhs = tolua_checkint64(L, 2);
-    tolua_pushint64(L, lhs + rhs);
+    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);    
+    uint64_t rhs = tolua_checkuint64(L, 2);
+    tolua_pushuint64(L, lhs + rhs);
     return 1;
 }
 
-static int _int64sub(lua_State* L)
+static int _uint64sub(lua_State *L)
 {
-    int64_t lhs = *(int64_t*)lua_touserdata(L, 1);    
-    int64_t rhs = tolua_checkint64(L, 2);
-    tolua_pushint64(L, lhs - rhs);
+    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);    
+    uint64_t rhs = tolua_checkuint64(L, 2);
+    tolua_pushuint64(L, lhs - rhs);
     return 1;
 }
 
-
-static int _int64mul(lua_State* L)
+static int _uint64mul(lua_State *L)
 {
-    int64_t lhs = *(int64_t*)lua_touserdata(L, 1);    
-    int64_t rhs = tolua_checkint64(L, 2);
-    tolua_pushint64(L, lhs * rhs);
+    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);    
+    uint64_t rhs = tolua_checkuint64(L, 2);
+    tolua_pushuint64(L, lhs * rhs);
     return 1;    
 }
 
-static int _int64div(lua_State* L)
+static int _uint64div(lua_State *L)
 {
-    int64_t lhs = *(int64_t*)lua_touserdata(L, 1);    
-    int64_t rhs = tolua_checkint64(L, 2);
-    tolua_pushint64(L, lhs / rhs);
+    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);    
+    uint64_t rhs = tolua_checkuint64(L, 2);
+    tolua_pushuint64(L, lhs / rhs);
     return 1;
 }
 
-static int _int64mod(lua_State* L)
+static int _uint64mod(lua_State *L)
 {
-    int64_t lhs = *(int64_t*)lua_touserdata(L, 1);    
-    int64_t rhs = tolua_checkint64(L, 2);
+    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);    
+    uint64_t rhs = tolua_checkuint64(L, 2);
 
     if (rhs == 0) 
     {
         return luaL_error(L, "mod by zero");
     }
 
-    tolua_pushint64(L, lhs % rhs);
+    tolua_pushuint64(L, lhs % rhs);
     return 1;
 }
 
-static int _int64unm(lua_State* L)
+static int _uint64unm(lua_State *L)
 {
-    int64_t lhs = *(int64_t*)lua_touserdata(L, 1);        
-    tolua_pushint64(L, -lhs);
+    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);        
+    tolua_pushuint64(L, -lhs);
     return 1;
 }
 
-static int _int64pow(lua_State* L)
+static int _uint64pow(lua_State *L)
 {
-    int64_t lhs = *(int64_t*)lua_touserdata(L, 1);    
-    int64_t rhs = tolua_checkint64(L, 2);
-    int64_t ret;
+    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);    
+    uint64_t rhs = tolua_checkuint64(L, 2);
+    uint64_t ret;
     
     if (rhs > 0)
     {
@@ -250,70 +250,70 @@ static int _int64pow(lua_State* L)
         ret = 1;
     }
     else
-    {   
+    {                    
         char temp[64];
-        sprintf(temp, "%" PRId64, rhs);    
-        return luaL_error(L, "pow by nagtive number: %s", temp);                 
+        sprintf(temp, "%" PRIu64, rhs);    
+        return luaL_error(L, "pow by nagtive number: %s", temp);   
     }
 
-    tolua_pushint64(L, ret);
+    tolua_pushuint64(L, ret);
     return 1;
 }
 
-static int _int64eq(lua_State* L)
+static int _uint64eq(lua_State *L)
 {
-    int64_t lhs = *(int64_t*)lua_touserdata(L, 1);     
-    int64_t rhs = *(int64_t*)lua_touserdata(L, 2);     
+    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);     
+    uint64_t rhs = *(uint64_t*)lua_touserdata(L, 2);     
     lua_pushboolean(L, lhs == rhs);    
     return 1;
 }
 
-static int _int64equals(lua_State* L)
+static int _uint64equals(lua_State *L)
 {
-    int64_t lhs = tolua_checkint64(L, 1);
-    int64_t rhs = tolua_checkint64(L, 2);
+    uint64_t lhs = tolua_checkuint64(L, 1);
+    uint64_t rhs = tolua_checkuint64(L, 2);
     lua_pushboolean(L, lhs == rhs);
     return 1;
 }
 
-static int _int64lt(lua_State* L)
+static int _uint64lt(lua_State *L)
 {
-    int64_t lhs = *(int64_t*)lua_touserdata(L, 1); 
-    int64_t rhs = tolua_checkint64(L, 2);
+    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1); 
+    uint64_t rhs = tolua_checkuint64(L, 2);
     lua_pushboolean(L, lhs < rhs);
     return 1;
 }
 
-static int _int64le(lua_State* L)
+static int _uint64le(lua_State *L)
 {
-    int64_t lhs = *(int64_t*)lua_touserdata(L, 1); 
-    int64_t rhs = tolua_checkint64(L, 2);
+    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1); 
+    uint64_t rhs = tolua_checkuint64(L, 2);
     lua_pushboolean(L, lhs <= rhs);
     return 1;
 }
 
-static int _int64tostring(lua_State* L)
+static int _uint64tostring(lua_State *L)
 {    
-    if (!tolua_isint64(L, 1))
+    if (!tolua_isuint64(L, 1))
     {
-        return luaL_typerror(L, 1, "long");
+        return luaL_typerror(L, 1, "ulong");
     }
 
-    int64_t n = tolua_toint64(L, 1);    
+    uint64_t n = tolua_touint64(L, 1);    
     char temp[64];
-    sprintf(temp, "%" PRId64, n);    
+    sprintf(temp, "%" PRIu64, n);    
     lua_pushstring(L, temp);
     return 1;
 }
 
-static int _int64tonum2(lua_State* L)
+static int _uint64tonum2(lua_State *L)
 {
-    if (!tolua_isint64(L, 1))
+    if (!tolua_isuint64(L, 1))
     {
-        return luaL_typerror(L, 1, "long");
+        return luaL_typerror(L, 1, "ulong");
     }
 
-    int64_t n = tolua_toint64(L, 1);
+    uint64_t n = tolua_touint64(L, 1);
 
     //作为无符号数拆分
     if (n != 0)
@@ -332,117 +332,117 @@ static int _int64tonum2(lua_State* L)
     return 2;
 }
 
-int tolua_newint64(lua_State* L)
+int tolua_newuint64(lua_State *L)
 {
-    int64_t n = 0;
+    uint64_t n = 0;
     int type = lua_type(L, 1);
 
     if (type == LUA_TSTRING)
     {        
-        n = _long(L, 1);                  
+        n = _ulong(L, 1);                  
     }
     else if (type == LUA_TNUMBER)
     {
-        int64_t n1 = (int64_t)luaL_checknumber(L, 1);
-        int64_t n2 = (int64_t)lua_tonumber(L, 2);
+        uint64_t n1 = (uint64_t)luaL_checknumber(L, 1);
+        uint64_t n2 = (uint64_t)lua_tonumber(L, 2);
 
         if (n1 < 0 || n1 > UINT_MAX)
         {
-            return luaL_error(L, "#1 out of range: %" PRId64, n1);
+            return luaL_error(L, "#1 out of range: %" PRIu64, n1);
         }
 
         if (n2 < 0 || n2 > UINT_MAX)
         {
-            return luaL_error(L, "#2 out of range: %" PRId64, n2);
+            return luaL_error(L, "#2 out of range: %" PRIu64, n2);
         }
 
         n = n1 + (n2 << 32);
     }
 
-    tolua_pushint64(L, n);
+    tolua_pushuint64(L, n);
     return 1;
 }
 
 
-void tolua_openint64(lua_State* L)
+void tolua_openuint64(lua_State *L)
 {        
     lua_newtable(L);      
     lua_pushvalue(L, -1);
-    lua_setglobal(L, "int64");
+    lua_setglobal(L, "uint64");
 
     lua_getref(L, LUA_RIDX_LOADED);
-    lua_pushstring(L, "int64");
+    lua_pushstring(L, "uint64");
     lua_pushvalue(L, -3);
     lua_rawset(L, -3);
     lua_pop(L, 1);
 
     lua_pushstring(L, "__add"),
-    lua_pushcfunction(L, _int64add);
+    lua_pushcfunction(L, _uint64add);
     lua_rawset(L, -3);
 
     lua_pushstring(L, "__sub"),
-    lua_pushcfunction(L, _int64sub);
+    lua_pushcfunction(L, _uint64sub);
     lua_rawset(L, -3);
 
     lua_pushstring(L, "__mul"),
-    lua_pushcfunction(L, _int64mul);
+    lua_pushcfunction(L, _uint64mul);
     lua_rawset(L, -3);
 
     lua_pushstring(L, "__div"),
-    lua_pushcfunction(L, _int64div);
+    lua_pushcfunction(L, _uint64div);
     lua_rawset(L, -3);
 
     lua_pushstring(L, "__mod"),
-    lua_pushcfunction(L, _int64mod);
+    lua_pushcfunction(L, _uint64mod);
     lua_rawset(L, -3);
 
     lua_pushstring(L, "__unm"),
-    lua_pushcfunction(L, _int64unm);
+    lua_pushcfunction(L, _uint64unm);
     lua_rawset(L, -3);
 
     lua_pushstring(L, "__pow"),
-    lua_pushcfunction(L, _int64pow);
+    lua_pushcfunction(L, _uint64pow);
     lua_rawset(L, -3);    
 
     lua_pushstring(L, "__tostring");
-    lua_pushcfunction(L, _int64tostring);
+    lua_pushcfunction(L, _uint64tostring);
     lua_rawset(L, -3);      
 
     lua_pushstring(L, "tostring");
-    lua_pushcfunction(L, _int64tostring);
+    lua_pushcfunction(L, _uint64tostring);
     lua_rawset(L, -3);     
 
     lua_pushstring(L, "__eq");
-    lua_pushcfunction(L, _int64eq);
+    lua_pushcfunction(L, _uint64eq);
     lua_rawset(L, -3);  
 
     lua_pushstring(L, "__lt");
-    lua_pushcfunction(L, _int64lt);
+    lua_pushcfunction(L, _uint64lt);
     lua_rawset(L, -3); 
 
     lua_pushstring(L, "__le");
-    lua_pushcfunction(L, _int64le);
+    lua_pushcfunction(L, _uint64le);
     lua_rawset(L, -3);     
 
     lua_pushstring(L, ".name");
-    lua_pushstring(L, "int64");
+    lua_pushstring(L, "uint64");
     lua_rawset(L, -3);
 
     lua_pushstring(L, "new");
-    lua_pushcfunction(L, tolua_newint64);
+    lua_pushcfunction(L, tolua_newuint64);
     lua_rawset(L, -3);       
 
     lua_pushstring(L, "equals");
-    lua_pushcfunction(L, _int64equals);
+    lua_pushcfunction(L, _uint64equals);
     lua_rawset(L, -3);     
 
     lua_pushstring(L, "tonum2");
-    lua_pushcfunction(L, _int64tonum2);
+    lua_pushcfunction(L, _uint64tonum2);
     lua_rawset(L, -3);        
 
     lua_pushstring(L, "__index");
     lua_pushvalue(L, -2);
     lua_rawset(L, -3);    
 
-    lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_INT64);     
+    lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_UINT64);     
 }

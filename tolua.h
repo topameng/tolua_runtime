@@ -31,17 +31,25 @@
 #define LUA_RIDX_UPDATE				22
 #define LUA_RIDX_LATEUPDATE			23
 #define LUA_RIDX_FIXEDUPDATE		24
+#define LUA_RIDX_PRELOAD			25
+#define LUA_RIDX_LOADED				26
+#define LUA_RIDX_UINT64				27
 
 #define LUA_NULL_USERDATA 	1
 #define TOLUA_NOPEER    	LUA_REGISTRYINDEX 		
 #define FLAG_INDEX_ERROR 	1
 #define FLAG_INT64       	2
+#define FLAG_UINT64			4
 
+#define MAX_ITEM 512
 
 #define abs_index(L, i)  ((i) > 0 || (i) <= LUA_REGISTRYINDEX ? (i) : lua_gettop(L) + (i) + 1)
 
 void tolua_openint64(lua_State* L);
 int  tolua_newint64(lua_State* L);
+
+void tolua_openuint64(lua_State* L);
+int  tolua_newuint64(lua_State* L);
 
 int toluaflags;
 

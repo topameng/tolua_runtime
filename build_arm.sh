@@ -9,7 +9,7 @@ NDKF="--sysroot $NDK/platforms/android-$NDKABI/arch-arm"
 NDKARCH="-march=armv7-a -mfloat-abi=softfp -Wl,--fix-cortex-a8"
 
 make clean
-make HOST_CC="gcc -m32" CROSS=$NDKP TARGET_SYS=Linux TARGET_FLAGS="$NDKF $NDKARCH"
+make HOST_CC="gcc -O2 -m32" CROSS=$NDKP TARGET_SYS=Linux TARGET_FLAGS="$NDKF $NDKARCH"
 cp ./libluajit.a ../../android/jni/libluajit.a
 make clean
 
