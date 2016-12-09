@@ -6,7 +6,9 @@ mac: build_osx.sh (xcode + luac5.1.5 luajit can't run in unity5) <br>
 ios: build_ios.sh (xcode + luajit2.1 beta) <br>
 
 NDK 版本:android-ndk-r10e 默认安装到 D:/android-ndk-r10e<br>
-https://dl.google.com/android/repository/android-ndk-r10e-windows-x86_64.zip
+https://dl.google.com/android/repository/android-ndk-r10e-windows-x86_64.zip<br>
+Msys2配置说明<br>
+https://github.com/topameng/tolua_runtime/wiki<br>
 #Libs
 **cjson**<br>
 https://github.com/mpx/lua-cjson<br>
