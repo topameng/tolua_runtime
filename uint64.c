@@ -184,7 +184,7 @@ static uint64_t tolua_checkuint64(lua_State *L, int pos)
 
 static int _uint64add(lua_State *L)
 {
-    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);    
+    uint64_t lhs = tolua_checkuint64(L, 1);    
     uint64_t rhs = tolua_checkuint64(L, 2);
     tolua_pushuint64(L, lhs + rhs);
     return 1;
@@ -192,7 +192,7 @@ static int _uint64add(lua_State *L)
 
 static int _uint64sub(lua_State *L)
 {
-    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);    
+    uint64_t lhs = tolua_checkuint64(L, 1);    
     uint64_t rhs = tolua_checkuint64(L, 2);
     tolua_pushuint64(L, lhs - rhs);
     return 1;
@@ -200,7 +200,7 @@ static int _uint64sub(lua_State *L)
 
 static int _uint64mul(lua_State *L)
 {
-    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);    
+    uint64_t lhs = tolua_checkuint64(L, 1);    
     uint64_t rhs = tolua_checkuint64(L, 2);
     tolua_pushuint64(L, lhs * rhs);
     return 1;    
@@ -208,7 +208,7 @@ static int _uint64mul(lua_State *L)
 
 static int _uint64div(lua_State *L)
 {
-    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);    
+    uint64_t lhs = tolua_checkuint64(L, 1);    
     uint64_t rhs = tolua_checkuint64(L, 2);
     tolua_pushuint64(L, lhs / rhs);
     return 1;
@@ -216,7 +216,7 @@ static int _uint64div(lua_State *L)
 
 static int _uint64mod(lua_State *L)
 {
-    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);    
+    uint64_t lhs = tolua_checkuint64(L, 1);    
     uint64_t rhs = tolua_checkuint64(L, 2);
 
     if (rhs == 0) 
@@ -237,7 +237,7 @@ static int _uint64unm(lua_State *L)
 
 static int _uint64pow(lua_State *L)
 {
-    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);    
+    uint64_t lhs = tolua_checkuint64(L, 1);    
     uint64_t rhs = tolua_checkuint64(L, 2);
     uint64_t ret;
     
@@ -278,7 +278,7 @@ static int _uint64equals(lua_State *L)
 
 static int _uint64lt(lua_State *L)
 {
-    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1); 
+    uint64_t lhs = tolua_checkuint64(L, 1); 
     uint64_t rhs = tolua_checkuint64(L, 2);
     lua_pushboolean(L, lhs < rhs);
     return 1;
@@ -286,7 +286,7 @@ static int _uint64lt(lua_State *L)
 
 static int _uint64le(lua_State *L)
 {
-    uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1); 
+    uint64_t lhs = tolua_checkuint64(L, 1); 
     uint64_t rhs = tolua_checkuint64(L, 2);
     lua_pushboolean(L, lhs <= rhs);
     return 1;
