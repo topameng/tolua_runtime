@@ -168,7 +168,7 @@ else
   endif
   # Use Clang for OSX host.
   ifeq (Darwin,$(HOST_SYS))
-    DEFAULT_CC= gcc
+    DEFAULT_CC= clang
   endif
 endif
 
