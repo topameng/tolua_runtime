@@ -9,6 +9,9 @@ NDK 版本:android-ndk-r10e 默认安装到 D:/android-ndk-r10e<br>
 https://dl.google.com/android/repository/android-ndk-r10e-windows-x86_64.zip<br>
 Msys2配置说明<br>
 https://github.com/topameng/tolua_runtime/wiki<br>
+配置好的Msys2下载<br>
+https://pan.baidu.com/s/1c2JzvDQ<br>
+
 #Libs
 **cjson**<br>
 https://github.com/mpx/lua-cjson<br>
