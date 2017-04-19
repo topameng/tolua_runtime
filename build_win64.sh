@@ -2,10 +2,10 @@
 # 62 Bit Version
 mkdir -p window/x86_64
 
-cd luajit
+cd luajit-2.1
 mingw32-make clean
 
-mingw32-make BUILDMODE=static CC="gcc -m64 -O3"
+mingw32-make BUILDMODE=static CC="gcc -m64 -O2"
 cp src/libluajit.a ../window/x86_64/libluajit.a
 mingw32-make clean
 
