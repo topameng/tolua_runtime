@@ -1,8 +1,8 @@
-cd luajit/src
+cd luajit-2.1/src
 
 # Android/x86, x86 (i686 SSE3), Android 4.0+ (ICS)
 NDK=D:/android-ndk-r10e
-NDKABI=19
+NDKABI=14
 NDKVER=$NDK/toolchains/x86-4.9
 NDKP=$NDKVER/prebuilt/windows-x86_64/bin/i686-linux-android-
 NDKF="--sysroot $NDK/platforms/android-$NDKABI/arch-x86"

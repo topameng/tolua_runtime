@@ -37,7 +37,7 @@ gcc -m64 -O3 -std=gnu99 -shared \
  luasocket/compat.c \
  -o Plugins/x86_64/tolua.dll \
  -I./ \
- -Iluajit/src \
+ -Iluajit-2.1/src \
  -Iluasocket \
  -lws2_32 \
  -Wl,--whole-archive window/x86_64/libluajit.a -Wl,--no-whole-archive -static-libgcc -static-libstdc++

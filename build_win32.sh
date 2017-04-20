@@ -37,7 +37,7 @@ gcc -m32 -O3 -std=gnu99 -shared \
 	luasocket/compat.c \
 	-o Plugins/x86/tolua.dll \
 	-I./ \
-	-Iluajit/src \
+	-Iluajit-2.1/src \
 	-Icjson \
 	-Iluasocket \
 	-lws2_32 \
