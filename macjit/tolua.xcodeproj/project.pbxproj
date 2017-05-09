@@ -351,23 +351,16 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					../luajit/src,
-					/Users/admin/Desktop/luawrap/luawrap,
+					../luajit-2.1/src,
 				);
 				INFOPLIST_FILE = "tolua/tolua-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
-				LIBRARY_SEARCH_PATHS = (
-					"$(PROJECT_DIR)",
-					/Users/admin/Desktop/luajit/bin/osx64,
-				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = (
-					"-all_load",
-					"-image_base",
-					100000000,
-				);
+				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = ameng.tolua;
 				PRODUCT_NAME = tolua;
-				VALID_ARCHS = x86_64;
+				VALID_ARCHS = "x86_64 i386";
 				WRAPPER_EXTENSION = bundle;
 			};
 			name = Debug;
@@ -382,23 +375,15 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					../luajit/src,
-					/Users/admin/Desktop/luawrap/luawrap,
 				);
 				INFOPLIST_FILE = "tolua/tolua-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
-				LIBRARY_SEARCH_PATHS = (
-					"$(PROJECT_DIR)",
-					/Users/admin/Desktop/luajit/bin/osx64,
-				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = (
-					"-all_load",
-					"-image_base",
-					100000000,
-				);
+				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = ameng.tolua;
 				PRODUCT_NAME = tolua;
-				VALID_ARCHS = x86_64;
+				VALID_ARCHS = "x86_64 i386";
 				WRAPPER_EXTENSION = bundle;
 			};
 			name = Release;
