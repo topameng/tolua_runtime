@@ -691,7 +691,7 @@ static int iostring_clear(lua_State* L)
     return 0;
 }
 
-static const struct luaL_reg _pb [] = 
+static const struct luaL_Reg _pb [] = 
 {
     {"varint_encoder", varint_encoder},
     {"varint_encoder64", varint_encoder64},    
@@ -712,7 +712,7 @@ static const struct luaL_reg _pb [] =
     {NULL, NULL}
 };
 
-static const struct luaL_reg _c_iostring_m [] = 
+static const struct luaL_Reg _c_iostring_m [] = 
 {
     {"__tostring", iostring_str},
     {"__len", iostring_len},

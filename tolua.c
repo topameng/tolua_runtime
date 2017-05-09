@@ -421,7 +421,7 @@ LUALIB_API int tolua_error(lua_State *L, const char *msg)
 
 LUALIB_API int tolua_getn(lua_State *L, int i)
 {
-    return luaL_getn(L, i);
+    return tolua_objlen(L, i);
 }
 
 LUALIB_API int tolua_strlen(const char *str)
@@ -2172,7 +2172,7 @@ void tolua_openvptr(lua_State *L)
     lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_VPTR); 
 }
 
-static const struct luaL_reg tolua_funcs[] = 
+static const struct luaL_Reg tolua_funcs[] = 
 {
 	{ "gettime", tolua_gettime },
 	{ "typename", tolua_bnd_type },
@@ -2544,7 +2544,7 @@ static int mathf_normalize(lua_State *L)
     return 3;
 }
 
-static const struct luaL_reg tolua_mathf[] = 
+static const struct luaL_Reg tolua_mathf[] = 
 {
     { "NextPowerOfTwo", mathf_nextpoweroftwo },
     { "ClosestPowerOfTwo", mathf_closestpoweroftwo },
