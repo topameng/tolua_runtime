@@ -123,6 +123,7 @@ static int64_t _long(lua_State* L, int pos)
         return luaL_error(L, "integral is too large: %s", str);
     }  
 
+    errno = old;
     return n;
 }
 

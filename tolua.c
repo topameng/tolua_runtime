@@ -1515,7 +1515,7 @@ LUA_API int tolua_getvaluetype(lua_State *L, int stackPos)
 	lua_getref(L, LUA_RIDX_CHECKVALUE);
 	lua_pushvalue(L, stackPos);
 	lua_call(L, 1, 1);
-	int ret = (int)luaL_checknumber(L, -1);
+	int ret = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1);
 	return ret;
 }
@@ -2183,6 +2183,7 @@ static const struct luaL_Reg tolua_funcs[] =
     { "initget", tolua_initgettable},
     { "int64", tolua_newint64},        
     { "uint64", tolua_newuint64},
+    { "traceback", traceback},
 	{ NULL, NULL }
 };
 
@@ -2259,7 +2260,7 @@ void tolua_openvaluetype(lua_State *L)
 }
 
 void tolua_openluavec3(lua_State *L)
-{
+{    
 	lua_getglobal(L, "Vector3");
 
     if (!lua_istable(L, 1))
@@ -2278,7 +2279,7 @@ void tolua_openluavec3(lua_State *L)
 }
 
 void tolua_openluavec2(lua_State *L)
-{
+{    
 	lua_getglobal(L, "Vector2");
 
     if (!lua_istable(L, 1))
@@ -2297,7 +2298,7 @@ void tolua_openluavec2(lua_State *L)
 }
 
 void tolua_openluavec4(lua_State *L)
-{
+{    
 	lua_getglobal(L, "Vector4");
 
     if (!lua_istable(L, 1))
@@ -2316,7 +2317,7 @@ void tolua_openluavec4(lua_State *L)
 }
 
 void tolua_openluaclr(lua_State *L)
-{
+{    
 	lua_getglobal(L, "Color");
 
     if (!lua_istable(L, 1))
@@ -2335,7 +2336,7 @@ void tolua_openluaclr(lua_State *L)
 }
 
 void tolua_openluaquat(lua_State *L)
-{
+{    
 	lua_getglobal(L, "Quaternion");
 
     if (!lua_istable(L, 1))
@@ -2349,12 +2350,12 @@ void tolua_openluaquat(lua_State *L)
 	lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_PACKQUAT);	
 	lua_pushstring(L, "Get");
 	lua_rawget(L, -2);
-	lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_UNPACKQUAT);	
+	lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_UNPACKQUAT);		
 	lua_pop(L, 1);
 }
 
 void tolua_openlualayermask(lua_State *L)
-{
+{    
     lua_getglobal(L, "LayerMask");   
 
     if (!lua_istable(L, 1))
@@ -2493,11 +2494,11 @@ static int mathf_lineartogammaspace (lua_State *L)
 {
     lua_Number value = luaL_checknumber(L, 1);
 
-    if (value <= 0.0F)
+    if (value <= 0.0f)
     {    
         value = 0;
     }
-    else if (value <= 0.0031308F)
+    else if (value <= 0.0031308f)
     {
         value *= 12.92f;
     }
@@ -2585,7 +2586,7 @@ LUALIB_API void tolua_openlibs(lua_State *L)
     lua_rawset(L, -3);
 
     lua_pushstring(L, "version");
-    lua_pushstring(L, "1.0.5");
+    lua_pushstring(L, "1.0.7");
     lua_rawset(L, -3);
 
     lua_settop(L,top);
