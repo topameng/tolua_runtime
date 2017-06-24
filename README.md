@@ -1,4 +1,4 @@
-#tolua_runtime
+# tolua_runtime
 **Build**<br>
 pc: build_win32.sh build_win64.h  (mingw + luajit2.0.4) <br>
 android: build_arm.sh build_x86.sh (mingw + luajit2.0.4) <br>
@@ -12,7 +12,7 @@ https://github.com/topameng/tolua_runtime/wiki<br>
 配置好的Msys2下载<br>
 https://pan.baidu.com/s/1c2JzvDQ<br>
 
-#Libs
+# Libs
 **cjson**<br>
 https://github.com/mpx/lua-cjson<br>
 **protoc-gen-lua**<br>
