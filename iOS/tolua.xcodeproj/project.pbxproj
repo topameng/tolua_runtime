@@ -20,7 +20,6 @@
 		840092BC1CCF455100F89A56 /* strbuf.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092B71CCF455100F89A56 /* strbuf.c */; };
 		840092E11CCF45A800F89A56 /* auxiliar.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092BE1CCF45A800F89A56 /* auxiliar.c */; };
 		840092E21CCF45A800F89A56 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092C01CCF45A800F89A56 /* buffer.c */; };
-		840092E31CCF45A800F89A56 /* compat.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092C21CCF45A800F89A56 /* compat.c */; };
 		840092E41CCF45A800F89A56 /* except.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092C41CCF45A800F89A56 /* except.c */; };
 		840092E51CCF45A800F89A56 /* inet.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092C61CCF45A800F89A56 /* inet.c */; };
 		840092E61CCF45A800F89A56 /* io.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092C81CCF45A800F89A56 /* io.c */; };
@@ -69,8 +68,6 @@
 		840092BF1CCF45A800F89A56 /* auxiliar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = auxiliar.h; sourceTree = "<group>"; };
 		840092C01CCF45A800F89A56 /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = buffer.c; sourceTree = "<group>"; };
 		840092C11CCF45A800F89A56 /* buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = buffer.h; sourceTree = "<group>"; };
-		840092C21CCF45A800F89A56 /* compat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = compat.c; sourceTree = "<group>"; };
-		840092C31CCF45A800F89A56 /* compat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compat.h; sourceTree = "<group>"; };
 		840092C41CCF45A800F89A56 /* except.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = except.c; sourceTree = "<group>"; };
 		840092C51CCF45A800F89A56 /* except.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = except.h; sourceTree = "<group>"; };
 		840092C61CCF45A800F89A56 /* inet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = inet.c; sourceTree = "<group>"; };
@@ -167,8 +164,6 @@
 				840092BF1CCF45A800F89A56 /* auxiliar.h */,
 				840092C01CCF45A800F89A56 /* buffer.c */,
 				840092C11CCF45A800F89A56 /* buffer.h */,
-				840092C21CCF45A800F89A56 /* compat.c */,
-				840092C31CCF45A800F89A56 /* compat.h */,
 				840092C41CCF45A800F89A56 /* except.c */,
 				840092C51CCF45A800F89A56 /* except.h */,
 				840092C61CCF45A800F89A56 /* inet.c */,
@@ -260,7 +255,6 @@
 			files = (
 				840092A11CCF43D600F89A56 /* tolua.m in Sources */,
 				840092EB1CCF45A800F89A56 /* serial.c in Sources */,
-				840092E31CCF45A800F89A56 /* compat.c in Sources */,
 				840092EE1CCF45A800F89A56 /* udp.c in Sources */,
 				840092E41CCF45A800F89A56 /* except.c in Sources */,
 				840092AC1CCF451400F89A56 /* lpeg.c in Sources */,
