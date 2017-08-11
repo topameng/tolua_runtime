@@ -30,3 +30,9 @@
 
 # Debug files
 *.dSYM/
+
+iOS/build
+Plugins/
+iOS/tolua.xcodeproj/xcuserdata
+iOS/tolua.xcodeproj/project.xcworkspace
+iOS/DerivedData
