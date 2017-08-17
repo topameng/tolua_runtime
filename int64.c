@@ -91,17 +91,17 @@ LUALIB_API bool tolua_isint64(lua_State* L, int pos)
 
 LUALIB_API void tolua_pushint64(lua_State* L, int64_t n)
 {
-    if (toluaflags & FLAG_INT64)    
+    /*if (toluaflags & FLAG_INT64)    
     {
         lua_pushinteger(L, (lua_Integer)n);
     }
     else
-    {
+    {*/
         int64_t* p = (int64_t*)lua_newuserdata(L, sizeof(int64_t));
         *p = n;
         lua_getref(L, LUA_RIDX_INT64);
         lua_setmetatable(L, -2);            
-    }
+    //}
 }
 
 //转换一个字符串为 int64
@@ -211,6 +211,12 @@ static int _int64div(lua_State* L)
 {
     int64_t lhs = tolua_checkint64(L, 1);    
     int64_t rhs = tolua_checkint64(L, 2);
+
+    if (rhs == 0) 
+    {
+        return luaL_error(L, "div by zero");
+    }
+
     tolua_pushint64(L, lhs / rhs);
     return 1;
 }
@@ -272,7 +278,7 @@ static int _int64eq(lua_State* L)
 static int _int64equals(lua_State* L)
 {
     int64_t lhs = tolua_checkint64(L, 1);
-    int64_t rhs = tolua_checkint64(L, 2);
+    int64_t rhs = tolua_toint64(L, 2);
     lua_pushboolean(L, lhs == rhs);
     return 1;
 }

@@ -39,7 +39,6 @@
 #define TOLUA_NOPEER    	LUA_REGISTRYINDEX 		
 #define FLAG_INDEX_ERROR 	1
 #define FLAG_INT64       	2
-#define FLAG_UINT64			4
 
 #define MAX_ITEM 512
 
@@ -47,6 +46,7 @@
 
 void tolua_openint64(lua_State* L);
 int  tolua_newint64(lua_State* L);
+void tolua_pushint64(lua_State* L, int64_t n);
 
 void tolua_openuint64(lua_State* L);
 int  tolua_newuint64(lua_State* L);

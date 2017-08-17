@@ -91,17 +91,10 @@ LUALIB_API bool tolua_isuint64(lua_State *L, int pos)
 
 LUALIB_API void tolua_pushuint64(lua_State *L, uint64_t n)
 {
-    if (toluaflags & FLAG_UINT64)    
-    {
-        lua_pushinteger(L, (lua_Integer)n);
-    }
-    else
-    {
-        uint64_t* p = (uint64_t*)lua_newuserdata(L, sizeof(uint64_t));
-        *p = n;
-        lua_getref(L, LUA_RIDX_UINT64);
-        lua_setmetatable(L, -2);            
-    }
+    uint64_t* p = (uint64_t*)lua_newuserdata(L, sizeof(uint64_t));
+    *p = n;
+    lua_getref(L, LUA_RIDX_UINT64);
+    lua_setmetatable(L, -2);                
 }
 
 //转换一个字符串为 uint64
@@ -194,7 +187,15 @@ static int _uint64sub(lua_State *L)
 {
     uint64_t lhs = tolua_checkuint64(L, 1);    
     uint64_t rhs = tolua_checkuint64(L, 2);
-    tolua_pushuint64(L, lhs - rhs);
+
+    if (lhs > rhs)
+    {
+        tolua_pushuint64(L, lhs - rhs);
+    }
+    else
+    {
+        tolua_pushint64(L, lhs - rhs);
+    }
     return 1;
 }
 
@@ -210,6 +211,12 @@ static int _uint64div(lua_State *L)
 {
     uint64_t lhs = tolua_checkuint64(L, 1);    
     uint64_t rhs = tolua_checkuint64(L, 2);
+
+    if (rhs == 0) 
+    {
+        return luaL_error(L, "div by zero");
+    }
+
     tolua_pushuint64(L, lhs / rhs);
     return 1;
 }
@@ -271,7 +278,7 @@ static int _uint64eq(lua_State *L)
 static int _uint64equals(lua_State *L)
 {
     uint64_t lhs = tolua_checkuint64(L, 1);
-    uint64_t rhs = tolua_checkuint64(L, 2);
+    uint64_t rhs = tolua_touint64(L, 2);
     lua_pushboolean(L, lhs == rhs);
     return 1;
 }
