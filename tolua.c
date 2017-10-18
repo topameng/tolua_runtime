@@ -1444,17 +1444,16 @@ static int tolua_lazyclosure(lua_State *L)
 			}
 			lua_pop(L, 1);
 
-			while (lua_getmetatable(L, -1) != 0)
+			while (!bFuncExisted && lua_getmetatable(L, -1) != 0)
 			{
 				lua_pushvalue(L, lua_upvalueindex(4));
 				lua_rawget(L, -2);
 
 				if (lua_isfunction(L, -1))
 				{
-					lua_pop(L, 1);
 					bFuncExisted = true;
-					break;
 				}
+
 				lua_pop(L, 1);
 			}
 
@@ -1520,25 +1519,29 @@ LUALIB_API void tolua_lazyfunction(lua_State *L, const char *name, lua_CFunction
 }
 
 LUALIB_API void tolua_variable(lua_State *L, const char *name, lua_CFunction get, lua_CFunction set)
-{                
-    lua_pushlightuserdata(L, &gettag);
-    lua_rawget(L, -2);
+{
+	/* set func */
+	if (get != NULL)
+	{
+		lua_pushlightuserdata(L, &gettag);
+		lua_rawget(L, -2);
 
-    if (!lua_istable(L, -1))
-    {
-        /* create .get table, leaving it at the top */
-        lua_pop(L, 1);
-        lua_newtable(L);        
-        lua_pushlightuserdata(L, &gettag);
-        lua_pushvalue(L, -2);
-        lua_rawset(L, -4);
-    }
+		if (!lua_istable(L, -1))
+		{
+			/* create .get table, leaving it at the top */
+			lua_pop(L, 1);
+			lua_newtable(L);
+			lua_pushlightuserdata(L, &gettag);
+			lua_pushvalue(L, -2);
+			lua_rawset(L, -4);
+		}
 
-    lua_pushstring(L, name);
-    //lua_pushcfunction(L, get);
-    tolua_pushcfunction(L, get);
-    lua_rawset(L, -3);                  /* store variable */
-    lua_pop(L, 1);                      /* pop .get table */
+		lua_pushstring(L, name);
+		//lua_pushcfunction(L, get);
+		tolua_pushcfunction(L, get);
+		lua_rawset(L, -3);                  /* store variable */
+		lua_pop(L, 1);                      /* pop .get table */
+	}
 
     /* set func */
     if (set != NULL)
@@ -1562,6 +1565,163 @@ LUALIB_API void tolua_variable(lua_State *L, const char *name, lua_CFunction get
         lua_rawset(L, -3);                  /* store variable */
         lua_pop(L, 1);                      /* pop .set table */
     }
+}
+
+static int tolua_lazyVariableClosure(lua_State *L)
+{
+	bool bFuncExisted = false;
+	int stackTop = lua_gettop(L);
+	lua_CFunction fn = (lua_CFunction)lua_tocfunction(L, lua_upvalueindex(2));
+	lua_getref(L, LUA_RIDX_LOADED);
+	lua_pushvalue(L, lua_upvalueindex(3));
+	lua_rawget(L, -2);
+
+	// push mt
+	if (lua_istable(L, -1))
+	{
+		// regist once
+		if (lua_toboolean(L, lua_upvalueindex(5)))
+		{
+			lua_pushlightuserdata(L, &gettag);
+			lua_rawget(L, -2);					//stack: loaded t tget
+			if (lua_istable(L, -1))
+			{
+				lua_pushvalue(L, lua_upvalueindex(4));
+				lua_rawget(L, -2);
+
+				if (lua_isfunction(L, -1))
+				{
+					// remove old function
+					lua_pushvalue(L, lua_upvalueindex(4));
+					lua_pushnil(L);
+					lua_rawset(L, -4);
+					bFuncExisted = true;
+				}
+
+				lua_pop(L, 1);
+			}
+			lua_pop(L, 1);						//stack: loaded t
+
+			while (!bFuncExisted && lua_getmetatable(L, -1) != 0)
+			{
+				lua_pushlightuserdata(L, &gettag);
+				lua_rawget(L, -2);				//stack: loaded t mt tget
+
+				if (lua_istable(L, -1))
+				{
+					lua_pushvalue(L, lua_upvalueindex(4));
+					lua_rawget(L, -2);
+
+					if (lua_isfunction(L, -1))
+					{
+						bFuncExisted = true;
+					}
+
+					lua_pop(L, 1);
+				}
+
+				lua_pop(L, 1);
+			}
+
+			if (bFuncExisted)
+			{
+				lua_replace(L, stackTop + 1);
+				lua_settop(L, stackTop + 1);
+			}
+		}
+		else
+		{
+			// registed
+			bFuncExisted = true;
+			lua_settop(L, stackTop);
+		}
+	}
+
+	if (!bFuncExisted)
+	{
+		lua_settop(L, stackTop);
+		const char* className = lua_tostring(L, lua_upvalueindex(3));
+		const char* funcName = lua_tostring(L, lua_upvalueindex(4));
+		return luaL_error(L, "LazyFunction(%s) Doesn't Exist In %s", funcName, className);
+	}
+
+	lua_pushvalue(L, lua_upvalueindex(4));// push key
+	lua_pushvalue(L, lua_upvalueindex(5));// push lazyStatus
+	lua_pushvalue(L, lua_upvalueindex(6));// push getStatus
+	int r = fn(L);
+	lua_pushboolean(L, 0);
+	lua_replace(L, lua_upvalueindex(5));
+
+	if (lua_toboolean(L, lua_upvalueindex(1)))
+	{
+		lua_pushboolean(L, 0);
+		lua_replace(L, lua_upvalueindex(1));
+		return lua_error(L);
+	}
+
+	return r;
+}
+
+//hack for luac, 避免luac error破坏包裹c#函数的异常块(luajit采用的是类似c++异常)
+static int tolua_pushLazyVariableDispacher(lua_State *L, bool getStatus, const char* className, const char* name, lua_CFunction dispacher)
+{
+	lua_pushboolean(L, 0);
+	lua_pushcfunction(L, dispacher);
+	lua_pushstring(L, className);
+	lua_pushstring(L, name);
+	lua_pushboolean(L, 1);
+	lua_pushboolean(L, getStatus);
+	lua_pushcclosure(L, tolua_lazyVariableClosure, 6);
+	return 0;
+}
+
+LUALIB_API void tolua_lazyVariable(lua_State *L, const char *name, bool get, bool set, lua_CFunction dispacher)
+{
+	lua_pushstring(L, ".name");
+	lua_rawget(L, -2);
+	const char* className = lua_tostring(L, -1);
+	lua_pop(L, 1);						/* pop .name value */
+
+	/* get func */
+	lua_pushlightuserdata(L, &gettag);
+	lua_rawget(L, -2);
+
+	if (!lua_istable(L, -1))
+	{
+		/* create .get table, leaving it at the top */
+		lua_pop(L, 1);
+		lua_newtable(L);
+		lua_pushlightuserdata(L, &gettag);
+		lua_pushvalue(L, -2);
+		lua_rawset(L, -4);
+	}
+
+	lua_pushstring(L, name);
+	tolua_pushLazyVariableDispacher(L, true, className, name, dispacher);
+	lua_rawset(L, -3);                  /* store variable */
+	lua_pop(L, 1);                      /* pop .get table */
+
+	/* set func */
+	if (set)
+	{
+		lua_pushlightuserdata(L, &settag);
+		lua_rawget(L, -2);
+
+		if (!lua_istable(L, -1))
+		{
+			/* create .set table, leaving it at the top */
+			lua_pop(L, 1);
+			lua_newtable(L);
+			lua_pushlightuserdata(L, &settag);
+			lua_pushvalue(L, -2);
+			lua_rawset(L, -4);
+		}
+
+		lua_pushstring(L, name);
+		tolua_pushLazyVariableDispacher(L, false, className, name, dispacher);
+		lua_rawset(L, -3);                  /* store variable */
+		lua_pop(L, 1);                      /* pop .set table */
+	}
 }
 
 LUALIB_API int toluaL_ref(lua_State *L)
