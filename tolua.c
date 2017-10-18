@@ -1474,9 +1474,9 @@ static int tolua_lazyclosure(lua_State *L)
 	if (!bFuncExisted)
 	{
 		lua_settop(L, stackTop);
-		const char* className = lua_tostring(L, lua_upvalueindex(3));
+		const char* hostName = lua_tostring(L, lua_upvalueindex(3));
 		const char* funcName = lua_tostring(L, lua_upvalueindex(4));
-		return luaL_error(L, "LazyFunction(%s) Doesn't Exist In %s", funcName, className);
+		return luaL_error(L, "LazyFunction(%s) Doesn't Exist In %s", funcName, hostName);
 	}
 
 	lua_pushvalue(L, lua_upvalueindex(4));// push key
@@ -1496,11 +1496,11 @@ static int tolua_lazyclosure(lua_State *L)
 }
 
 //hack for luac, 避免luac error破坏包裹c#函数的异常块(luajit采用的是类似c++异常)
-LUA_API int tolua_pushlazycfunction(lua_State *L, const char* className, const char* name, lua_CFunction fn)
+static int tolua_pushlazycfunction(lua_State *L, const char* hostName, const char* name, lua_CFunction fn)
 {
 	lua_pushboolean(L, 0);
 	lua_pushcfunction(L, fn);
-	lua_pushstring(L, className);
+	lua_pushstring(L, hostName);
 	lua_pushstring(L, name);
 	lua_pushboolean(L, 1);
 	lua_pushcclosure(L, tolua_lazyclosure, 5);
@@ -1509,12 +1509,17 @@ LUA_API int tolua_pushlazycfunction(lua_State *L, const char* className, const c
 
 LUALIB_API void tolua_lazyfunction(lua_State *L, const char *name, lua_CFunction fn)
 {
-	lua_pushstring(L, name);
 	lua_pushstring(L, ".name");
-	lua_rawget(L, -3);
-	const char* className = lua_tostring(L, -1);
+	lua_rawget(L, -2);
+	if (lua_isnil(L, -1))
+	{
+		luaL_error(L, "Can't Find Host By Index [.name]!");
+	}
+	const char* hostName = lua_tostring(L, -1);
 	lua_pop(L, 1);
-	tolua_pushlazycfunction(L, className, name, fn);
+
+	lua_pushstring(L, name);
+	tolua_pushlazycfunction(L, hostName, name, fn);
 	lua_rawset(L, -3);
 }
 
@@ -1640,9 +1645,9 @@ static int tolua_lazyVariableClosure(lua_State *L)
 	if (!bFuncExisted)
 	{
 		lua_settop(L, stackTop);
-		const char* className = lua_tostring(L, lua_upvalueindex(3));
+		const char* hostName = lua_tostring(L, lua_upvalueindex(3));
 		const char* funcName = lua_tostring(L, lua_upvalueindex(4));
-		return luaL_error(L, "LazyFunction(%s) Doesn't Exist In %s", funcName, className);
+		return luaL_error(L, "LazyFunction(%s) Doesn't Exist In %s", funcName, hostName);
 	}
 
 	lua_pushvalue(L, lua_upvalueindex(4));// push key
@@ -1663,11 +1668,11 @@ static int tolua_lazyVariableClosure(lua_State *L)
 }
 
 //hack for luac, 避免luac error破坏包裹c#函数的异常块(luajit采用的是类似c++异常)
-static int tolua_pushLazyVariableDispacher(lua_State *L, bool getStatus, const char* className, const char* name, lua_CFunction dispacher)
+static int tolua_pushLazyVariableDispacher(lua_State *L, bool getStatus, const char* hostName, const char* name, lua_CFunction dispacher)
 {
 	lua_pushboolean(L, 0);
 	lua_pushcfunction(L, dispacher);
-	lua_pushstring(L, className);
+	lua_pushstring(L, hostName);
 	lua_pushstring(L, name);
 	lua_pushboolean(L, 1);
 	lua_pushboolean(L, getStatus);
@@ -1679,7 +1684,11 @@ LUALIB_API void tolua_lazyVariable(lua_State *L, const char *name, bool get, boo
 {
 	lua_pushstring(L, ".name");
 	lua_rawget(L, -2);
-	const char* className = lua_tostring(L, -1);
+	if (lua_isnil(L, -1))
+	{
+		luaL_error(L, "Can't Find Host By Index [.name]!");
+	}
+	const char* hostName = lua_tostring(L, -1);
 	lua_pop(L, 1);						/* pop .name value */
 
 	/* get func */
@@ -1697,7 +1706,7 @@ LUALIB_API void tolua_lazyVariable(lua_State *L, const char *name, bool get, boo
 	}
 
 	lua_pushstring(L, name);
-	tolua_pushLazyVariableDispacher(L, true, className, name, dispacher);
+	tolua_pushLazyVariableDispacher(L, true, hostName, name, dispacher);
 	lua_rawset(L, -3);                  /* store variable */
 	lua_pop(L, 1);                      /* pop .get table */
 
@@ -1718,7 +1727,7 @@ LUALIB_API void tolua_lazyVariable(lua_State *L, const char *name, bool get, boo
 		}
 
 		lua_pushstring(L, name);
-		tolua_pushLazyVariableDispacher(L, false, className, name, dispacher);
+		tolua_pushLazyVariableDispacher(L, false, hostName, name, dispacher);
 		lua_rawset(L, -3);                  /* store variable */
 		lua_pop(L, 1);                      /* pop .set table */
 	}
