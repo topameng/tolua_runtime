@@ -367,7 +367,7 @@ LUA_API int tolua_pushcfunction(lua_State *L, lua_CFunction fn)
 {        
     lua_pushboolean(L, 0);
     lua_pushcfunction(L, fn);
-	lua_pushcclosure(L, tolua_closure, 2);
+    lua_pushcclosure(L, tolua_closure, 2);
     return 0;
 }
 
@@ -1412,9 +1412,9 @@ LUALIB_API void tolua_constant(lua_State *L, const char *name, double value)
 
 LUALIB_API void tolua_function(lua_State *L, const char *name, lua_CFunction fn)
 {
-	lua_pushstring(L, name);
-	tolua_pushcfunction(L, fn);
-	lua_rawset(L, -3);
+  	lua_pushstring(L, name);
+    tolua_pushcfunction(L, fn);
+  	lua_rawset(L, -3);
 }
 
 static int tolua_lazyclosure(lua_State *L)
