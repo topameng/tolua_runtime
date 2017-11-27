@@ -2230,8 +2230,7 @@ void tolua_opentraceback(lua_State *L)
     lua_pop(L, 1);    
 
     lua_pushcfunction(L, traceback);
-    lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_CUSTOMTRACEBACK);
-    lua_pop(L, 1);
+    lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_CUSTOMTRACEBACK);    
 }
 
 void tolua_openubox(lua_State *L)
