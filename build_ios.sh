@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
+
+LUALIB="${1:-luajit}"
 set -e
 set -x
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 LIPO="xcrun -sdk iphoneos lipo"
 STRIP="xcrun -sdk iphoneos strip"
+LIBTOOL="xcrun -sdk iphoneos libtool"
 
-SRCDIR=$DIR/luajit-2.1/
+JITSRCDIR=$DIR/luajit-2.1/
+LUASRCDIR=$DIR/lua
 DESTDIR=$DIR/iOS
 IXCODE=`xcode-select -print-path`
 ISDK=$IXCODE/Platforms/iPhoneOS.platform/Developer
@@ -31,42 +35,49 @@ if [ ! -e $ISDKP/strip ]; then
 fi
 
 rm -f "$DESTDIR"/*.a
-cd $SRCDIR
 
-make clean
-ISDKF="-arch armv7 -isysroot $ISDK/SDKs/$ISDKVER $ISDKFCom"
-make HOST_CC="gcc -m32" TARGET_FLAGS="$ISDKF" TARGET=armv7 TARGET_SYS=iOS BUILDMODE=static
-mv "$SRCDIR"/src/libluajit.a "$DESTDIR"/libluajit-armv7.a
+if [ $LUALIB = 'lua' ]
+then
+    cd $LUASRCDIR
+    xcodebuild clean
+    xcodebuild -configuration Release
+    mv $LUASRCDIR/build/Release-iphoneos/liblua.a $DESTDIR/lib$LUALIB.a
+else
+    cd $JITSRCDIR
+    make clean
+    ISDKF="-arch armv7 -isysroot $ISDK/SDKs/$ISDKVER $ISDKFCom"
+    make HOST_CC="gcc -m32" TARGET_FLAGS="$ISDKF" TARGET=armv7 TARGET_SYS=iOS BUILDMODE=static
+    mv "$JITSRCDIR"/src/lib$LUALIB.a "$DESTDIR"/lib$LUALIB-armv7.a
 
-make clean
-ISDKF="-arch arm64 -isysroot $ISDK/SDKs/$ISDKVER $ISDKFCom"
-make HOST_CC="gcc " TARGET_FLAGS="$ISDKF" TARGET=arm64 TARGET_SYS=iOS BUILDMODE=static
-mv "$SRCDIR"/src/libluajit.a "$DESTDIR"/libluajit-arm64.a
+    make clean
+    ISDKF="-arch arm64 -isysroot $ISDK/SDKs/$ISDKVER $ISDKFCom"
+    make HOST_CC="gcc " TARGET_FLAGS="$ISDKF" TARGET=arm64 TARGET_SYS=iOS BUILDMODE=static
+    mv "$JITSRCDIR"/src/lib$LUALIB.a "$DESTDIR"/lib$LUALIB-arm64.a
 
-#make clean
-#ISDKF="-arch x86_64 -isysroot $ISDKSim/SDKs/$ISDKVERSim $ISDKFCom -mios-simulator-version-min=11.1 -DLUAJIT_ENABLE_GC64"
-#make HOST_CC="gcc " TARGET_FLAGS="$ISDKF" TARGET=x86_64 TARGET_SYS=iOS BUILDMODE=static
-#mv "$SRCDIR"/src/libluajit.a "$DESTDIR"/libluajit-x86_64.a
+    make clean
 
-#make clean
-#ISDKF="-arch i386 -isysroot $ISDKSim/SDKs/$ISDKVERSim $ISDKFCom -mios-simulator-version-min=10"
-#make HOST_CC="gcc -m32" TARGET_FLAGS="$ISDKF" TARGET=i386 TARGET_SYS=iOS BUILDMODE=static
-#mv "$SRCDIR"/src/libluajit.a "$DESTDIR"/libluajit-i386.a
+    cd ../iOS
+    $LIPO -create "$DESTDIR"/lib$LUALIB-*.a -output "$DESTDIR"/lib$LUALIB.a
+    $STRIP -S "$DESTDIR"/lib$LUALIB.a
 
-make clean
+    cd $DIR
+fi 
 
-cd ../iOS
-$LIPO -create "$DESTDIR"/libluajit-*.a -output "$DESTDIR"/libluajit.a
-$STRIP -S "$DESTDIR"/libluajit.a
-
-conf=Release
+cd $DESTDIR
 xcodebuild clean
-#xcodebuild -configuration=conf -sdk iphonesimulator
-xcodebuild -configuration=Release
+xcodebuild -configuration=Release HEADER_SEARCH_PATHS=$LUASRCDIR/src OTHER_LDFLAGS="-ObjC -l$LUALIB"
 
-mkdir -p ../Plugins/iOS
-cp ./build/Release-iphoneos/libtolua.a ../Plugins/iOS/libtolua.a
-
-#$LIPO -create ./build/$conf-iphoneos/libtolua.a build/$conf-iphonesimulator/libtolua.a -output ../Plugins/iOS/libtolua.a
-
+cd $LUASRCDIR
 xcodebuild clean
+xcodebuild -configuration Release -sdk iphonesimulator
+mv $LUASRCDIR/build/Release-iphonesimulator/liblua.a $DESTDIR/libluasim.a
+
+cd $DESTDIR
+xcodebuild -configuration=Release -sdk iphonesimulator HEADER_SEARCH_PATHS=$LUASRCDIR/src OTHER_LDFLAGS="-ObjC -lluasim"
+
+mkdir -p $DIR/Plugins/iOS
+
+cd $DESTDIR
+$LIPO -create build/Release-iphoneos/libtolua.a build/Release-iphonesimulator/libtolua.a -output $DESTDIR/libtolua.a
+$LIBTOOL -static -o $DIR/Plugins/iOS/libtolua.a $DESTDIR/libtolua.a $DESTDIR/lib$LUALIB.a $DESTDIR/libluasim.a
+

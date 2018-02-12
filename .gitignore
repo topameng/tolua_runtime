@@ -37,3 +37,8 @@ iOS/tolua.xcodeproj/xcuserdata
 iOS/tolua.xcodeproj/project.xcworkspace
 iOS/DerivedData
 tags
+macnojit/build
+macnojit/DerivedData
+DerivedData
+xcuserdata
+lua/build
