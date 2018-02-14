@@ -25,7 +25,7 @@
 **
 ** [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 */
-
+#if !defined(LUA_LJDIR)
 #define LUA_BITOP_VERSION	"1.0.2"
 
 #define LUA_LIB
@@ -186,4 +186,4 @@ LUALIB_API int luaopen_bit(lua_State *L)
 #endif
   return 1;
 }
-
+#endif // #if !defined(LUA_LJDIR) && LUA_VERSION_NUM==501

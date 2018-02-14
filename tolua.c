@@ -2743,3 +2743,11 @@ LUALIB_API int tolua_where (lua_State *L, int level)
     lua_pushliteral(L, "");
     return -1;
 }
+
+#if !defined(LUA_LJDIR)
+// dummy ffi when compiled with nojit lua
+LUALIB_API int luaopen_ffi(lua_State *L)
+{
+    return 1;
+}
+#endif
