@@ -18,6 +18,7 @@ gcc -m64 -O2 -std=gnu99 -shared \
  pb.c \
  lpeg.c \
  struct.c \
+ snapshot.c \
  cjson/strbuf.c \
  cjson/lua_cjson.c \
  cjson/fpconv.c \
@@ -34,6 +35,11 @@ gcc -m64 -O2 -std=gnu99 -shared \
  luasocket/timeout.c \
  luasocket/udp.c \
  luasocket/wsocket.c \
+ luaprofiler/stack.c \
+ luaprofiler/clocks.c \
+ luaprofiler/function_meter.c \
+ luaprofiler/core_profiler.c \
+ luaprofiler/lua50_profiler.c \
  -o Plugins/x86_64/tolua.dll \
  -I./ \
  -Iluajit-2.1/src \

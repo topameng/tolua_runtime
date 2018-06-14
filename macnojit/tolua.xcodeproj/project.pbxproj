@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		43AD011E20D2655800CA5AD2 /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = 43AD011D20D2655800CA5AD2 /* snapshot.c */; };
+		43AD012A20D2656000CA5AD2 /* core_profiler.c in Sources */ = {isa = PBXBuildFile; fileRef = 43AD012220D2656000CA5AD2 /* core_profiler.c */; };
+		43AD012B20D2656000CA5AD2 /* stack.c in Sources */ = {isa = PBXBuildFile; fileRef = 43AD012320D2656000CA5AD2 /* stack.c */; };
+		43AD012C20D2656000CA5AD2 /* lua50_profiler.c in Sources */ = {isa = PBXBuildFile; fileRef = 43AD012420D2656000CA5AD2 /* lua50_profiler.c */; };
+		43AD012D20D2656000CA5AD2 /* clocks.c in Sources */ = {isa = PBXBuildFile; fileRef = 43AD012520D2656000CA5AD2 /* clocks.c */; };
+		43AD012E20D2656000CA5AD2 /* function_meter.c in Sources */ = {isa = PBXBuildFile; fileRef = 43AD012820D2656000CA5AD2 /* function_meter.c */; };
 		840092821CCF406200F89A56 /* auxiliar.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092611CCF406200F89A56 /* auxiliar.c */; };
 		840092831CCF406200F89A56 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092631CCF406200F89A56 /* buffer.c */; };
 		840092841CCF406200F89A56 /* compat.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092651CCF406200F89A56 /* compat.c */; };
@@ -69,6 +75,17 @@
 		0F4B04D71800959F002EA938 /* tolua-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "tolua-Info.plist"; sourceTree = "<group>"; };
 		0F4B04D91800959F002EA938 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		0F4B04DB1800959F002EA938 /* tolua-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "tolua-Prefix.pch"; sourceTree = "<group>"; };
+		43AD011D20D2655800CA5AD2 /* snapshot.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = snapshot.c; path = ../../snapshot.c; sourceTree = "<group>"; };
+		43AD012020D2656000CA5AD2 /* clocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clocks.h; sourceTree = "<group>"; };
+		43AD012120D2656000CA5AD2 /* function_meter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = function_meter.h; sourceTree = "<group>"; };
+		43AD012220D2656000CA5AD2 /* core_profiler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = core_profiler.c; sourceTree = "<group>"; };
+		43AD012320D2656000CA5AD2 /* stack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stack.c; sourceTree = "<group>"; };
+		43AD012420D2656000CA5AD2 /* lua50_profiler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lua50_profiler.c; sourceTree = "<group>"; };
+		43AD012520D2656000CA5AD2 /* clocks.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = clocks.c; sourceTree = "<group>"; };
+		43AD012620D2656000CA5AD2 /* core_profiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = core_profiler.h; sourceTree = "<group>"; };
+		43AD012720D2656000CA5AD2 /* stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stack.h; sourceTree = "<group>"; };
+		43AD012820D2656000CA5AD2 /* function_meter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = function_meter.c; sourceTree = "<group>"; };
+		43AD012920D2656000CA5AD2 /* luaprofiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = luaprofiler.h; sourceTree = "<group>"; };
 		840092611CCF406200F89A56 /* auxiliar.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = auxiliar.c; sourceTree = "<group>"; };
 		840092621CCF406200F89A56 /* auxiliar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = auxiliar.h; sourceTree = "<group>"; };
 		840092631CCF406200F89A56 /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = buffer.c; sourceTree = "<group>"; };
@@ -199,6 +216,8 @@
 		0F4B04D51800959F002EA938 /* tolua */ = {
 			isa = PBXGroup;
 			children = (
+				43AD011F20D2656000CA5AD2 /* luaprofiler */,
+				43AD011D20D2655800CA5AD2 /* snapshot.c */,
 				842A59A21C85B76100EA2815 /* cjson */,
 				84EF23541C4CCD3F0093A49A /* lua */,
 				84F8B8B81C4567C100AE9B8F /* luasocket */,
@@ -222,6 +241,24 @@
 				0F4B04DB1800959F002EA938 /* tolua-Prefix.pch */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		43AD011F20D2656000CA5AD2 /* luaprofiler */ = {
+			isa = PBXGroup;
+			children = (
+				43AD012020D2656000CA5AD2 /* clocks.h */,
+				43AD012120D2656000CA5AD2 /* function_meter.h */,
+				43AD012220D2656000CA5AD2 /* core_profiler.c */,
+				43AD012320D2656000CA5AD2 /* stack.c */,
+				43AD012420D2656000CA5AD2 /* lua50_profiler.c */,
+				43AD012520D2656000CA5AD2 /* clocks.c */,
+				43AD012620D2656000CA5AD2 /* core_profiler.h */,
+				43AD012720D2656000CA5AD2 /* stack.h */,
+				43AD012820D2656000CA5AD2 /* function_meter.c */,
+				43AD012920D2656000CA5AD2 /* luaprofiler.h */,
+			);
+			name = luaprofiler;
+			path = ../../luaprofiler;
 			sourceTree = "<group>";
 		};
 		842A59A21C85B76100EA2815 /* cjson */ = {
@@ -410,6 +447,7 @@
 				84EF23981C4CCD3F0093A49A /* llex.c in Sources */,
 				840092901CCF406200F89A56 /* unix.c in Sources */,
 				84F8B8B71C45679C00AE9B8F /* lpeg.c in Sources */,
+				43AD012D20D2656000CA5AD2 /* clocks.c in Sources */,
 				840092831CCF406200F89A56 /* buffer.c in Sources */,
 				849CC46B1C9846C800D4D510 /* int64.c in Sources */,
 				8400928A1CCF406200F89A56 /* options.c in Sources */,
@@ -424,12 +462,14 @@
 				840092911CCF406200F89A56 /* usocket.c in Sources */,
 				84EF23951C4CCD3F0093A49A /* lgc.c in Sources */,
 				842A59AA1C85B76100EA2815 /* lua_cjson.c in Sources */,
+				43AD012B20D2656000CA5AD2 /* stack.c in Sources */,
 				84EF23A51C4CCD3F0093A49A /* ltm.c in Sources */,
 				84EF239D1C4CCD3F0093A49A /* lopcodes.c in Sources */,
 				84F8B8B31C45678E00AE9B8F /* tolua.c in Sources */,
 				84EF239C1C4CCD3F0093A49A /* lobject.c in Sources */,
 				840092881CCF406200F89A56 /* luasocket.c in Sources */,
 				84EF23A11C4CCD3F0093A49A /* lstring.c in Sources */,
+				43AD012A20D2656000CA5AD2 /* core_profiler.c in Sources */,
 				842A59AB1C85B76100EA2815 /* strbuf.c in Sources */,
 				84EF23A31C4CCD3F0093A49A /* ltable.c in Sources */,
 				84EF23A41C4CCD3F0093A49A /* ltablib.c in Sources */,
@@ -437,6 +477,7 @@
 				84EF239F1C4CCD3F0093A49A /* lparser.c in Sources */,
 				840092891CCF406200F89A56 /* mime.c in Sources */,
 				84EF23A91C4CCD3F0093A49A /* lvm.c in Sources */,
+				43AD012C20D2656000CA5AD2 /* lua50_profiler.c in Sources */,
 				84EF23911C4CCD3F0093A49A /* ldebug.c in Sources */,
 				84EF23921C4CCD3F0093A49A /* ldo.c in Sources */,
 				84EF23A01C4CCD3F0093A49A /* lstate.c in Sources */,
@@ -449,7 +490,9 @@
 				84EF238F1C4CCD3F0093A49A /* lcode.c in Sources */,
 				84EF239E1C4CCD3F0093A49A /* loslib.c in Sources */,
 				84EF238E1C4CCD3F0093A49A /* lbaselib.c in Sources */,
+				43AD011E20D2655800CA5AD2 /* snapshot.c in Sources */,
 				84EF238C1C4CCD3F0093A49A /* lapi.c in Sources */,
+				43AD012E20D2656000CA5AD2 /* function_meter.c in Sources */,
 				84EF23961C4CCD3F0093A49A /* linit.c in Sources */,
 				8400928E1CCF406200F89A56 /* timeout.c in Sources */,
 				84EF238D1C4CCD3F0093A49A /* lauxlib.c in Sources */,

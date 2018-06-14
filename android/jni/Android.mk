@@ -10,6 +10,7 @@ LOCAL_FORCE_STATIC_EXECUTABLE := true
 LOCAL_MODULE := tolua
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../luajit-2.1/src
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../luaprofiler
 
 LOCAL_CPPFLAGS := -O2
 LOCAL_CFLAGS :=  -O2 -std=gnu99
@@ -19,6 +20,7 @@ LOCAL_SRC_FILES :=	../../tolua.c \
 					../../pb.c \
 					../../lpeg.c \
 					../../struct.c \
+					../../snapshot.c \
 					../../cjson/strbuf.c \
 					../../cjson/lua_cjson.c \
 					../../cjson/fpconv.c \
@@ -35,6 +37,11 @@ LOCAL_SRC_FILES :=	../../tolua.c \
  					../../luasocket/timeout.c \
  					../../luasocket/udp.c \
  					../../luasocket/usocket.c \
+ 					../../luaprofiler/stack.c \
+					../../luaprofiler/clocks.c \
+					../../luaprofiler/function_meter.c \
+					../../luaprofiler/core_profiler.c \
+					../../luaprofiler/lua50_profiler.c \
  					
 LOCAL_WHOLE_STATIC_LIBRARIES += libluajit
 include $(BUILD_SHARED_LIBRARY)

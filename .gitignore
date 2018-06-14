@@ -1,5 +1,4 @@
 # Object files
-*.o
 *.ko
 *.obj
 *.elf
@@ -10,7 +9,6 @@
 
 # Libraries
 *.lib
-*.a
 *.la
 *.lo
 
