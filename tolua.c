@@ -1817,7 +1817,7 @@ static int traceback(lua_State *L)
 
 LUALIB_API int tolua_beginpcall(lua_State *L, int reference)
 {	
-    lua_pushcfunction(L, traceback);    
+    lua_getref(L, LUA_RIDX_CUSTOMTRACEBACK);
 	int top = lua_gettop(L);
 	lua_getref(L, reference);
 	return top;
@@ -1825,7 +1825,7 @@ LUALIB_API int tolua_beginpcall(lua_State *L, int reference)
 
 LUALIB_API void tolua_pushtraceback(lua_State *L)
 {
-	lua_pushcfunction(L, traceback);
+	lua_getref(L, LUA_RIDX_CUSTOMTRACEBACK);
 }
 
 /*static const int sentinel_ = 0;
@@ -1920,7 +1920,7 @@ void tolua_openrequire(lua_State *L)
 LUALIB_API int tolua_require(lua_State *L, const char *fileName)
 {
     int top = lua_gettop(L);
-    lua_pushcfunction(L, traceback);       
+    lua_getref(L, LUA_RIDX_CUSTOMTRACEBACK);
     lua_getref(L, LUA_RIDX_REQUIRE);
     lua_pushstring(L, fileName);        
     int ret = lua_pcall(L, 1, -1, top + 1);
@@ -2228,6 +2228,9 @@ void tolua_opentraceback(lua_State *L)
     lua_setfield(L, LUA_GLOBALSINDEX, "traceback");            
     lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_TRACEBACK);
     lua_pop(L, 1);    
+
+    lua_pushcfunction(L, traceback);
+    lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_CUSTOMTRACEBACK);    
 }
 
 void tolua_openubox(lua_State *L)
