@@ -14,7 +14,7 @@ cp ./libluajit.a ../../android/jni/libluajit.a
 make clean
 
 cd ../../android
-D:/Android/android-ndk-r13b/ndk-build.cmd clean APP_ABI="armeabi-v7a,x86"
-D:/Android/android-ndk-r13b/ndk-build.cmd APP_ABI="armeabi-v7a"
+$NDK/ndk-build clean APP_ABI="armeabi-v7a,x86,arm64-v8a"
+$NDK/ndk-build APP_ABI="armeabi-v7a"
 cp libs/armeabi-v7a/libtolua.so ../Plugins/Android/libs/armeabi-v7a
-D:/Android/android-ndk-r13b/ndk-build.cmd clean APP_ABI="armeabi-v7a,x86"
+$NDK/ndk-build clean APP_ABI="armeabi-v7a,x86,arm64-v8a"
