@@ -5,8 +5,8 @@ android: build_arm.sh build_x86.sh (mingw + luajit2.0.4) <br>
 mac: build_osx.sh (xcode + luac5.1.5 for luajit can't run on unity5) <br>
 ios: build_ios.sh (xcode + luajit2.1 beta) <br>
 
-NDK 版本:android-ndk-r10e 默认安装到 D:/android-ndk-r10e<br>
-https://dl.google.com/android/repository/android-ndk-r10e-windows-x86_64.zip<br>
+NDK 版本:android-ndk-r17c 默认安装到 D:/android-ndk-r17c<br>
+https://dl.google.com/android/repository/android-ndk-r17c-windows-x86_64.zip<br>
 Msys2配置说明<br>
 https://github.com/topameng/tolua_runtime/wiki<br>
 配置好的Msys2下载<br>
