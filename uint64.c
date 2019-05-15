@@ -353,12 +353,12 @@ int tolua_newuint64(lua_State *L)
         uint64_t n1 = (uint64_t)luaL_checknumber(L, 1);
         uint64_t n2 = (uint64_t)lua_tonumber(L, 2);
 
-        if (n1 > UINT_MAX)
+        if (n1 < 0 || n1 > UINT_MAX)
         {
             return luaL_error(L, "#1 out of range: %" PRIu64, n1);
         }
 
-        if (n2 > UINT_MAX)
+        if (n2 < 0 || n2 > UINT_MAX)
         {
             return luaL_error(L, "#2 out of range: %" PRIu64, n2);
         }
