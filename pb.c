@@ -722,8 +722,8 @@ static int signed_varint_size(lua_State* L)
     else if (value <= 0x3ffffffffff) lua_pushnumber(L, 6);
     else if (value <= 0x1ffffffffffff) lua_pushnumber(L, 7);
     else if (value <= 0xffffffffffffff) lua_pushnumber(L, 8);
-    else if (value <= 0x7fffffffffffffff) lua_pushnumber(L, 9);
-    else lua_pushnumber(L, 10);    
+    else lua_pushnumber(L, 9);
+    //else lua_pushnumber(L, 10);    
 
     return 1;
 }
