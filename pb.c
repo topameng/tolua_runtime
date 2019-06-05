@@ -161,7 +161,11 @@ static int64_t _long(lua_State* L, int pos)
 
     if (type == LUA_TNUMBER)
     {
-        n = (int64_t)lua_tonumber(L, pos);        
+#if LUA_VERSION_NUM == 501
+        n = (int64_t)lua_tonumber(L, pos);    
+#else
+        n = (int64_t)lua_tointeger(L, pos);
+#endif
     }
     else if (type == LUA_TSTRING)
     {
@@ -189,7 +193,11 @@ static uint64_t _ulong(lua_State* L, int pos)
 
     if (type == LUA_TNUMBER)
     {
+#if LUA_VERSION_NUM == 501
         n = (uint64_t)lua_tonumber(L, pos);    
+#else
+        n = (uint64_t)lua_tointeger(L, pos);
+#endif
     }
     else if (type == LUA_TSTRING)
     {
@@ -499,7 +507,11 @@ static int64_t  maxint  = (((int64_t)1) << (8*sizeof(int32_t)-1)) - 1;
 
 static int zig_zag_encode64(lua_State *L)
 {
+#if LUA_VERSION_NUM == 501
     int64_t n = (int64_t)luaL_checknumber(L, 1);
+#else
+    int64_t n = (int64_t)luaL_checkinteger(L, 1);
+#endif
     uint64_t value = (n << 1) ^ (n >> 63);
 
     if (sizeof(lua_Integer) < 8 && value > umaxint) 
@@ -518,7 +530,11 @@ static int zig_zag_encode64(lua_State *L)
 
 static int zig_zag_decode64(lua_State *L)
 {
+#if LUA_VERSION_NUM == 501
     uint64_t n = (uint64_t)luaL_checknumber(L, 1);
+#else
+    uint64_t n = (uint64_t)luaL_checkinteger(L, 1);
+#endif
     int64_t value = (n >> 1) ^ - (int64_t)(n & 1);
 
     if (sizeof(lua_Integer) < 8 && (value > maxint || value < (-maxint-1))) 
@@ -766,8 +782,13 @@ LUALIB_API int luaopen_pb (lua_State *L)
     luaL_newmetatable(L, IOSTRING_META);
     lua_pushvalue(L, -1);
     lua_setfield(L, -2, "__index");
-    luaL_register(L, NULL, _c_iostring_m);
-
-    luaL_register(L, "pb", _pb);
+#if LUA_VERSION_NUM == 501
+    luaL_register(L, NULL, _c_iostring_m);     
+    luaL_register(L, "pb", _pb);    
+#else 
+    luaL_newlib(L, _c_iostring_m);
+    luaL_newlib(L, _pb);
+	lua_setglobal(L, "pb");
+#endif
     return 1;
 } 
