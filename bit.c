@@ -183,6 +183,7 @@ LUALIB_API int luaopen_bit(lua_State *L)
   luaL_register(L, "bit", bit_funcs);
 #else
   luaL_newlib(L, bit_funcs);
+  lua_setglobal(L, "bit");
 #endif
   return 1;
 }

@@ -157,15 +157,12 @@ static void pack_varint(luaL_Buffer *b, uint64_t value)
 static int64_t _long(lua_State* L, int pos)
 {
     int64_t n = 0;
+#if LUA_VERSION_NUM == 501
     int type = lua_type(L, pos);
 
     if (type == LUA_TNUMBER)
     {
-#if LUA_VERSION_NUM == 501
         n = (int64_t)lua_tonumber(L, pos);    
-#else
-        n = (int64_t)lua_tointeger(L, pos);
-#endif
     }
     else if (type == LUA_TSTRING)
     {
@@ -182,22 +179,22 @@ static int64_t _long(lua_State* L, int pos)
 
         errno = old;
     }
-    
+#else
+    n = (int64_t)lua_tointeger(L, pos);
+#endif
+
     return n;
 }
 
 static uint64_t _ulong(lua_State* L, int pos)
 {
     uint64_t n = 0;
+#if LUA_VERSION_NUM == 501
     int type = lua_type(L, pos);
 
     if (type == LUA_TNUMBER)
     {
-#if LUA_VERSION_NUM == 501
         n = (uint64_t)lua_tonumber(L, pos);    
-#else
-        n = (uint64_t)lua_tointeger(L, pos);
-#endif
     }
     else if (type == LUA_TSTRING)
     {
@@ -214,6 +211,9 @@ static uint64_t _ulong(lua_State* L, int pos)
 
         errno = old;
     }
+#else
+    n = (uint64_t)lua_tointeger(L, pos);
+#endif
         
     return n;
 }
@@ -738,8 +738,7 @@ static int signed_varint_size(lua_State* L)
     else if (value <= 0x3ffffffffff) lua_pushnumber(L, 6);
     else if (value <= 0x1ffffffffffff) lua_pushnumber(L, 7);
     else if (value <= 0xffffffffffffff) lua_pushnumber(L, 8);
-    else if (value <= 0x7fffffffffffffff) lua_pushnumber(L, 9);
-    else lua_pushnumber(L, 10);    
+    else lua_pushnumber(L, 9);
 
     return 1;
 }
