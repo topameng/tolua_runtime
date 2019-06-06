@@ -2757,7 +2757,6 @@ LUALIB_API int tolua_where (lua_State *L, int level)
 }
 
 #if LUA_VERSION_NUM == 501
-
 LUALIB_API void lua_pushglobaltable(lua_State *L)
 {
 	lua_pushvalue(L, LUA_GLOBALSINDEX);

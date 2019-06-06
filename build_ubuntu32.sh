@@ -1,6 +1,7 @@
 #!/bin/bash
-# 64 Bit Version
-mkdir -p window/x86_64
+# 32 Bit Version
+# build for Ubuntu18.04
+mkdir -p ubuntu/x86
 luacdir="lua53"
 luajitdir="luajit-2.1"
 luapath=""
@@ -8,7 +9,7 @@ lualibname=""
 
 while :
 do
-    echo "Please choose (1„ÄÅluajit; 2„ÄÅlua5.3)"
+    echo "Please choose (1°¢luajit; 2°¢lua5.3)"
     read input
     case $input in
         "1")
@@ -31,23 +32,25 @@ done
 echo "select : $luapath"
 
 cd $luapath
-mingw32-make clean
+make clean
 
 case $luapath in 
     $luacdir)
-        mingw32-make mingw BUILDMODE=static CC="gcc -m64 -O2"
+        make mingw BUILDMODE=static CC="gcc -fPIC -m32 -O2"
     ;;
     $luajitdir)
-        mingw32-make BUILDMODE=static CC="gcc -m64 -O2" XCFLAGS=-DLUAJIT_ENABLE_GC64
+        make BUILDMODE=static CC="gcc -fPIC -m32 -O2"
     ;;
 esac
 
-cp src/$lualibname.a ../window/x86_64/$lualibname.a
-mingw32-make clean
+cp src/$lualibname.a ../ubuntu/x86/$lualibname.a
+make clean
+
+echo -e "\n[MAINTAINCE] build $lualibname.a done\n"
 
 cd ..
 
-gcc -m64 -O2 -std=gnu99 -shared \
+gcc -m32 -O2 -std=gnu99 -shared \
  tolua.c \
  int64.c \
  uint64.c \
@@ -69,10 +72,16 @@ gcc -m64 -O2 -std=gnu99 -shared \
  luasocket/tcp.c \
  luasocket/timeout.c \
  luasocket/udp.c \
- luasocket/wsocket.c \
- -o Plugins/x86_64/tolua.dll \
+ luasocket/usocket.c \
+ -fPIC\
+ -o Plugins/x86/libtolua.so \
  -I./ \
  -I$luapath/src \
  -Iluasocket \
- -lws2_32 \
- -Wl,--whole-archive window/x86_64/$lualibname.a -Wl,--no-whole-archive -static-libgcc -static-libstdc++
+ -Wl,--whole-archive ubuntu/x86/$lualibname.a -Wl,--no-whole-archive -static-libgcc -static-libstdc++
+
+if [ "$?" = "0" ]; then
+	echo -e "\n[MAINTAINCE] build libtolua.so success"
+else
+	echo -e "\n[MAINTAINCE] build libtolua.so failed"
+fi
