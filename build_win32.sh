@@ -8,7 +8,7 @@ lualibname=""
 
 while :
 do
-    echo "Please choose (1、luajit; 2、lua5.3)"
+    echo "Please choose (1)luajit; (2)lua5.3"
     read input
     case $input in
         "1")
