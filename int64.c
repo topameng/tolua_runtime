@@ -311,6 +311,7 @@ static int _int64le(lua_State* L)
     lua_pushboolean(L, lhs <= rhs);
     return 1;
 }
+#endif
 
 static int _int64tostring(lua_State* L)
 {    
@@ -325,7 +326,6 @@ static int _int64tostring(lua_State* L)
     lua_pushstring(L, temp);
     return 1;
 }
-#endif
 
 static int _int64equals(lua_State* L)
 {
@@ -445,10 +445,6 @@ void tolua_openint64(lua_State* L)
     lua_pushcfunction(L, _int64tostring);
     lua_rawset(L, -3);      
 
-    lua_pushstring(L, "tostring");
-    lua_pushcfunction(L, _int64tostring);
-    lua_rawset(L, -3);     
-
     lua_pushstring(L, "__eq");
     lua_pushcfunction(L, _int64eq);
     lua_rawset(L, -3);  
@@ -477,6 +473,10 @@ void tolua_openint64(lua_State* L)
     lua_pushstring(L, "tonum2");
     lua_pushcfunction(L, _int64tonum2);
     lua_rawset(L, -3);        
+
+    lua_pushstring(L, "tostring");
+    lua_pushcfunction(L, _int64tostring);
+    lua_rawset(L, -3);     
 
     lua_pushstring(L, "__index");
     lua_pushvalue(L, -2);
