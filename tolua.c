@@ -284,7 +284,7 @@ static int _lua_getfield(lua_State *L)
         
 LUA_API int tolua_getfield(lua_State *L, int idx, const char *field)
 {
-    idx = abs_index(L, idx);    
+    idx = lua_absindex(L, idx);    
     lua_pushcfunction(L, _lua_getfield);
     lua_pushvalue(L, idx);
     lua_pushstring(L, field);
@@ -301,7 +301,7 @@ static int _lua_setfield(lua_State *L)
 LUA_API int tolua_setfield(lua_State *L, int idx, const char *key)        
 {
     int top = lua_gettop(L);
-    idx = abs_index(L, idx);
+    idx = lua_absindex(L, idx);
     lua_pushcfunction(L, _lua_setfield);
     lua_pushvalue(L, idx);
     lua_pushstring(L, key);
@@ -319,7 +319,7 @@ static int _lua_gettable(lua_State *L)
 LUA_API int tolua_gettable(lua_State *L, int idx)
 {
     int top = lua_gettop(L);
-    idx = abs_index(L, idx);
+    idx = lua_absindex(L, idx);
     lua_pushcfunction(L, _lua_gettable);
     lua_pushvalue(L, idx);
     lua_pushvalue(L, top);
@@ -336,7 +336,7 @@ static int _lua_settable(lua_State *L)
 LUA_API int tolua_settable(lua_State *L, int idx)
 {
     int top = lua_gettop(L);
-    idx = abs_index(L, idx);
+    idx = lua_absindex(L, idx);
     lua_pushcfunction(L, _lua_settable);
     lua_pushvalue(L, idx);
     lua_pushvalue(L, top - 1);
@@ -1467,7 +1467,7 @@ LUALIB_API void tolua_variable(lua_State *L, const char *name, lua_CFunction get
 
 LUALIB_API int toluaL_ref(lua_State *L)
 {
-	int stackPos = abs_index(L, -1);	
+	int stackPos = lua_absindex(L, -1);	
 	lua_getref(L, LUA_RIDX_FIXEDMAP);
 	lua_pushvalue(L, stackPos);
 	lua_rawget(L, -2);
@@ -1510,7 +1510,7 @@ LUA_API lua_State* tolua_getmainstate(lua_State *L1)
 
 LUA_API int tolua_getvaluetype(lua_State *L, int stackPos)
 {
-	stackPos = abs_index(L, stackPos);
+	stackPos = lua_absindex(L, stackPos);
 	lua_getref(L, LUA_RIDX_CHECKVALUE);
 	lua_pushvalue(L, stackPos);
 	lua_call(L, 1, 1);
@@ -2198,11 +2198,10 @@ void tolua_setluabaseridx(lua_State *L)
 		lua_rawseti(L, LUA_REGISTRYINDEX, i);
 	}
 
-#if LUA_VERSION_NUM == 501
     //同lua5.1.5之后版本放入mainstate和_G
 	lua_pushthread(L);
 	lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_MAINTHREAD);
-    
+#if LUA_VERSION_NUM == 501
 	lua_pushglobaltable(L);
 	lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
 #endif
@@ -2765,6 +2764,10 @@ LUALIB_API void lua_pushglobaltable(lua_State *L)
 #undef lua_upvalueindex
 LUALIB_API int lua_upvalueindex(int idx) {
 	return LUA_GLOBALSINDEX - idx;
+}
+
+LUA_API int lua_absindex (lua_State *L, int idx) {
+    return abs_index(L, idx);
 }
 
 #elif LUA_VERSION_NUM == 503

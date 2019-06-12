@@ -56,8 +56,10 @@ int  tolua_newuint64(lua_State* L);
 extern int toluaflags;
 
 #if LUA_VERSION_NUM == 501
-LUALIB_API void lua_pushglobaltable(lua_State *L);
+LUA_API void (lua_pushglobaltable) (lua_State *L);
+LUA_API int  (lua_absindex) (lua_State *L, int idx);
 #else
+
 #undef lua_getfenv
 #define lua_getfenv	lua_getuservalue
 #undef lua_setfenv
