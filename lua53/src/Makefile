@@ -113,7 +113,7 @@ macosx:
 	$(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_MACOSX" SYSLIBS="-lreadline"
 
 mingw:
-	$(MAKE) "LUA_A=lua53.a" "LUA_T=lua.exe" \
+	$(MAKE) "LUA_A=liblua.a" "LUA_T=lua.exe" \
 	"AR=$(AR) -o" "RANLIB=strip --strip-unneeded" \
 	"SYSCFLAGS=-static" "SYSLIBS=" "SYSLDFLAGS=-s" lua.exe
 	$(MAKE) "LUAC_T=luac.exe" luac.exe
