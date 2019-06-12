@@ -46,11 +46,11 @@ typedef uint32_t UBits;
 
 typedef union {
   lua_Number n;
-#ifdef LUA_NUMBER_DOUBLE
+// #ifdef LUA_NUMBER_DOUBLE
   uint64_t b;
-#else
-  UBits b;
-#endif
+// #else
+//   UBits b;
+// #endif
 } BitNum;
 
 /* Convert argument to bit type. */
@@ -63,25 +63,25 @@ static UBits barg(lua_State *L, int idx)
 #else
   bn.n = luaL_checknumber(L, idx);
 #endif
-#if defined(LUA_NUMBER_DOUBLE)
+// #if defined(LUA_NUMBER_DOUBLE)
   bn.n += 6755399441055744.0;  /* 2^52+2^51 */
 #ifdef SWAPPED_DOUBLE
   b = (UBits)(bn.b >> 32);
 #else
   b = (UBits)bn.b;
 #endif
-#elif defined(LUA_NUMBER_INT) || defined(LUA_NUMBER_LONG) || \
-      defined(LUA_NUMBER_LONGLONG) || defined(LUA_NUMBER_LONG_LONG) || \
-      defined(LUA_NUMBER_LLONG)
-  if (sizeof(UBits) == sizeof(lua_Number))
-    b = bn.b;
-  else
-    b = (UBits)(SBits)bn.n;
-#elif defined(LUA_NUMBER_FLOAT)
-#error "A 'float' lua_Number type is incompatible with this library"
-#else
-#error "Unknown number type, check LUA_NUMBER_* in luaconf.h"
-#endif
+// #elif defined(LUA_NUMBER_INT) || defined(LUA_NUMBER_LONG) || \
+//       defined(LUA_NUMBER_LONGLONG) || defined(LUA_NUMBER_LONG_LONG) || \
+//       defined(LUA_NUMBER_LLONG)
+//   if (sizeof(UBits) == sizeof(lua_Number))
+//     b = bn.b;
+//   else
+//     b = (UBits)(SBits)bn.n;
+// #elif defined(LUA_NUMBER_FLOAT)
+// #error "A 'float' lua_Number type is incompatible with this library"
+// #else
+// #error "Unknown number type, check LUA_NUMBER_* in luaconf.h"
+// #endif
 #if LUA_VERSION_NUM < 502
   if (b == 0 && !lua_isnumber(L, idx)) {
     luaL_typerror(L, idx, "number");
@@ -167,14 +167,14 @@ LUALIB_API int luaopen_bit(lua_State *L)
   b = barg(L, -1);
   if (b != (UBits)1437217655L || BAD_SAR) {  /* Perform a simple self-test. */
     const char *msg = "compiled with incompatible luaconf.h";
-#ifdef LUA_NUMBER_DOUBLE
+// #ifdef LUA_NUMBER_DOUBLE
 #ifdef _WIN32
     if (b == (UBits)1610612736L)
       msg = "use D3DCREATE_FPU_PRESERVE with DirectX";
 #endif
     if (b == (UBits)1127743488L)
       msg = "not compiled with SWAPPED_DOUBLE";
-#endif
+// #endif
     if (BAD_SAR)
       msg = "arithmetic right-shift broken";
     luaL_error(L, "bit library self-test failed (%s)", msg);

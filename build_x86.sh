@@ -3,6 +3,7 @@ luajitdir="luajit-2.1"
 luapath=""
 lualibname=""
 lualinkpath=""
+outpath="Plugins"
 
 while :
 do
@@ -13,12 +14,14 @@ do
             luapath=$luajitdir
             lualibname="libluajit"
             lualinkpath="android"
+            outpath="Plugins"
             break
         ;;
         "2")
             luapath=$luacdir
             lualibname="liblua"
             lualinkpath="android53"
+            outpath="Plugins53"
             break
         ;;
         *)
@@ -56,5 +59,5 @@ esac
 cd ../../$lualinkpath
 $NDK/ndk-build clean APP_ABI="armeabi-v7a,x86"
 $NDK/ndk-build APP_ABI="x86"
-cp libs/x86/libtolua.so ../Plugins/Android/libs/x86
+cp libs/x86/libtolua.so ../$outpath/Android/libs/x86
 $NDK/ndk-build clean APP_ABI="armeabi-v7a,x86"

@@ -6,6 +6,7 @@ luacdir="lua53"
 luajitdir="luajit-2.1"
 luapath=""
 lualibname=""
+outpath="Plugins"
 
 while :
 do
@@ -15,11 +16,13 @@ do
         "1")
             luapath=$luajitdir
             lualibname="libluajit"
+            outpath="Plugins"
             break
         ;;
         "2")
             luapath=$luacdir
-            lualibname=$luacdir
+            lualibname="liblua"
+            outpath="Plugins53"
             break
         ;;
         *)
@@ -74,7 +77,7 @@ gcc -m64 -O2 -std=gnu99 -shared \
  luasocket/udp.c \
  luasocket/usocket.c \
  -fPIC\
- -o Plugins/x86_64/libtolua.so \
+ -o $outpath/x86_64/libtolua.so \
  -I./ \
  -I$luapath/src \
  -Iluasocket \

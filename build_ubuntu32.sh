@@ -6,20 +6,23 @@ luacdir="lua53"
 luajitdir="luajit-2.1"
 luapath=""
 lualibname=""
+outpath="Plugins"
 
 while :
 do
-    echo "Please choose (1¡¢luajit; 2¡¢lua5.3)"
+    echo "Please choose (1)luajit; (2)lua5.3"
     read input
     case $input in
         "1")
             luapath=$luajitdir
             lualibname="libluajit"
+            outpath="Plugins"
             break
         ;;
         "2")
             luapath=$luacdir
-            lualibname=$luacdir
+            lualibname="liblua"
+            outpath="Plugins53"
             break
         ;;
         *)
@@ -74,7 +77,7 @@ gcc -m32 -O2 -std=gnu99 -shared \
  luasocket/udp.c \
  luasocket/usocket.c \
  -fPIC\
- -o Plugins/x86/libtolua.so \
+ -o $outpath/x86/libtolua.so \
  -I./ \
  -I$luapath/src \
  -Iluasocket \
