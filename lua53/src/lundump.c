@@ -86,7 +86,8 @@ static lua_Integer LoadInteger (LoadState *S) {
 
 
 static TString *LoadString (LoadState *S) {
-  size_t size = LoadByte(S);
+  int size = LoadByte(S);
+  //size_t size = LoadByte(S);
   if (size == 0xFF)
     LoadVar(S, size);
   if (size == 0)
@@ -241,7 +242,8 @@ static void checkHeader (LoadState *S) {
     error(S, "format mismatch in");
   checkliteral(S, LUAC_DATA, "corrupted");
   checksize(S, int);
-  checksize(S, size_t);
+  checksize(S, int);
+  //checksize(S, size_t);
   checksize(S, Instruction);
   checksize(S, lua_Integer);
   checksize(S, lua_Number);

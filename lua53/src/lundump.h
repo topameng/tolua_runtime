@@ -20,8 +20,8 @@
 
 #define MYINT(s)	(s[0]-'0')
 #define LUAC_VERSION	(MYINT(LUA_VERSION_MAJOR)*16+MYINT(LUA_VERSION_MINOR))
-#define LUAC_FORMAT	0	/* this is the official format */
-
+//#define LUAC_FORMAT	0	/* this is the official format */
+#define LUAC_FORMAT		1//custom format
 /* load one chunk; from lundump.c */
 LUAI_FUNC LClosure* luaU_undump (lua_State* L, ZIO* Z, const char* name);
 
