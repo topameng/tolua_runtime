@@ -2847,6 +2847,18 @@ LUA_API void lua_replace (lua_State *L, int idx) {
 	lua_pop(L, 1);
 }
 
+#define lua51_equal(L,idx1,idx2)  lua_compare(L,(idx1),(idx2),LUA_OPEQ)
+
+LUA_API int lua_equal (lua_State *L, int index1, int index2) {
+  return lua51_equal(L, index1, index2);
+}
+
+#define lua51_lessthan(L,idx1,idx2)  lua_compare(L,(idx1),(idx2),LUA_OPLT)
+
+LUA_API int lua_lessthan (lua_State *L, int index1, int index2) {
+  return lua51_lessthan(L, index1, index2);
+}
+
 #undef lua_tonumber
 LUA_API lua_Number lua_tonumber (lua_State *L, int idx) {
 	return lua_tonumberx(L, idx, NULL);
@@ -2862,6 +2874,13 @@ LUA_API int lua_pcall (lua_State *L, int nargs, int nresults, int errfunc) {
 	return lua_pcallk(L, nargs, nresults, errfunc, 0, NULL);
 }
 
+#undef lua_cpcall
+LUA_API int lua_cpcall (lua_State *L, lua_CFunction func, void *ud) {
+    lua_pushcfunction(L, func);
+    lua_pushlightuserdata(L, ud);
+    return lua_pcall(L,1,0,0);
+}
+
 #undef lua_yield
 LUALIB_API void lua_yield(lua_State *L, int idx) {
 	lua_yieldk(L, idx, 0, NULL);
@@ -2870,6 +2889,11 @@ LUALIB_API void lua_yield(lua_State *L, int idx) {
 #undef lua_upvalueindex
 LUALIB_API int lua_upvalueindex(int idx) {
 	return LUA_REGISTRYINDEX - idx;
+}
+
+#undef luaL_loadfile
+LUALIB_API int luaL_loadfile(lua_State *L, const char *filename){
+    return luaL_loadfilex(L, filename, NULL);
 }
 #endif
 

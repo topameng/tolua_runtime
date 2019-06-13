@@ -39,7 +39,7 @@ make clean
 
 case $luapath in 
     $luacdir)
-        make mingw BUILDMODE=static CC="gcc -fPIC -m32 -O2"
+        make linux BUILDMODE=static CC="gcc -fPIC -m32 -O2"
     ;;
     $luajitdir)
         make BUILDMODE=static CC="gcc -fPIC -m32 -O2"
