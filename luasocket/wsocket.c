@@ -5,6 +5,8 @@
 * The penalty of calling select to avoid busy-wait is only paid when
 * the I/O call fail in the first place.
 \*=========================================================================*/
+#include "luasocket.h"
+
 #include <string.h>
 
 #include "socket.h"
@@ -131,11 +133,11 @@ int socket_connect(p_socket ps, SA *addr, socklen_t len, p_timeout tm) {
     /* we wait until something happens */
     err = socket_waitfd(ps, WAITFD_C, tm);
     if (err == IO_CLOSED) {
-        int len = sizeof(err);
+        int elen = sizeof(err);
         /* give windows time to set the error (yes, disgusting) */
         Sleep(10);
         /* find out why we failed */
-        getsockopt(*ps, SOL_SOCKET, SO_ERROR, (char *)&err, &len);
+        getsockopt(*ps, SOL_SOCKET, SO_ERROR, (char *)&err, &elen);
         /* we KNOW there was an error. if 'why' is 0, we will return
         * "unknown error", but it's not really our fault */
         return err > 0? err: IO_UNKNOWN;
@@ -430,4 +432,3 @@ const char *socket_gaistrerror(int err) {
         default: return gai_strerror(err);
     }
 }
-
