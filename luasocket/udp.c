@@ -130,7 +130,7 @@ int udp_open(lua_State *L) {
     auxiliar_add2group(L, "udp{connected}",   "select{able}");
     auxiliar_add2group(L, "udp{unconnected}", "select{able}");
     /* define library functions */
-    luaL_setfuncs(L, func, 0);
+    luasocket_setfuncs(L, func, 0);
     /* export default UDP size */
     lua_pushliteral(L, "_DATAGRAMSIZE");
     lua_pushinteger(L, UDP_DATAGRAMSIZE);

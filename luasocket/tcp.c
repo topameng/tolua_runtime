@@ -135,7 +135,7 @@ int tcp_open(lua_State *L)
     auxiliar_add2group(L, "tcp{client}", "tcp{any}");
     auxiliar_add2group(L, "tcp{server}", "tcp{any}");
     /* define library functions */
-    luaL_setfuncs(L, func, 0);
+    luasocket_setfuncs(L, func, 0);
     return 0;
 }
 

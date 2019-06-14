@@ -75,7 +75,7 @@ static int base_open(lua_State *L) {
     if (socket_open()) {
         /* export functions (and leave namespace table on top of stack) */
         lua_newtable(L);
-        luaL_setfuncs(L, func, 0);
+        luasocket_setfuncs(L, func, 0);
 #ifdef LUASOCKET_DEBUG
         lua_pushstring(L, "_DEBUG");
         lua_pushboolean(L, 1);

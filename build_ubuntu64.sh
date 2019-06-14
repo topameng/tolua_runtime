@@ -76,6 +76,7 @@ gcc -m64 -O2 -std=gnu99 -shared \
  luasocket/timeout.c \
  luasocket/udp.c \
  luasocket/usocket.c \
+ luasocket/compat.c \
  -fPIC\
  -o $outpath/x86_64/libtolua.so \
  -I./ \

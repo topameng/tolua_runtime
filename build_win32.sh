@@ -73,6 +73,7 @@ gcc -m32 -O2 -std=gnu99 -shared \
 	luasocket/timeout.c \
 	luasocket/udp.c \
 	luasocket/wsocket.c \
+	luasocket/compat.c \
 	-o $outpath/x86/tolua.dll \
 	-I./ \
  	-I$luapath/src \

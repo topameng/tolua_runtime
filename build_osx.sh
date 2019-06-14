@@ -27,7 +27,8 @@ do
     esac
 done
 
-cd $luapath
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR/$luapath
 xcodebuild clean
 xcodebuild -configuration=Release
 cp -r build/Release/tolua.bundle ../$outpath/

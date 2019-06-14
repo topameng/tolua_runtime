@@ -1,7 +1,7 @@
 #ifndef COMPAT_H
 #define COMPAT_H
 
-#if LUA_VERSION_NUM==501
+// #if LUA_VERSION_NUM==501
 
 #ifndef _WIN32
 #pragma GCC visibility push(hidden)
@@ -14,9 +14,9 @@ void *luasocket_testudata ( lua_State *L, int arg, const char *tname);
 #pragma GCC visibility pop
 #endif
 
-#define luaL_setfuncs luasocket_setfuncs
-#define luaL_testudata luasocket_testudata
+// #define luaL_setfuncs luasocket_setfuncs
+// #define luaL_testudata luasocket_testudata
 
 #endif
 
-#endif
+// #endif

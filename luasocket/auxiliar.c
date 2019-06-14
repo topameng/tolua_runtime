@@ -140,7 +140,7 @@ void *auxiliar_getgroupudata(lua_State *L, const char *groupname, int objidx) {
 * otherwise
 \*-------------------------------------------------------------------------*/
 void *auxiliar_getclassudata(lua_State *L, const char *classname, int objidx) {
-    return luaL_testudata(L, objidx, classname);
+    return luasocket_testudata(L, objidx, classname);
 }
 
 /*-------------------------------------------------------------------------*\
