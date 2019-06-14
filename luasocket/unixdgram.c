@@ -94,7 +94,7 @@ int unixdgram_open(lua_State *L)
     auxiliar_add2group(L, "unixdgram{connected}",   "select{able}");
     auxiliar_add2group(L, "unixdgram{unconnected}", "select{able}");
 
-    luaL_setfuncs(L, func, 0);
+    luasocket_setfuncs(L, func, 0);
     return 0;
 }
 

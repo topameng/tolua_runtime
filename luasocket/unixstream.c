@@ -90,7 +90,7 @@ int unixstream_open(lua_State *L)
     auxiliar_add2group(L, "unixstream{client}", "unixstream{any}");
     auxiliar_add2group(L, "unixstream{server}", "unixstream{any}");
 
-    luaL_setfuncs(L, func, 0);
+    luasocket_setfuncs(L, func, 0);
     return 0;
 }
 
