@@ -20,7 +20,7 @@ do
         "2")
             luapath=$luacdir
             lualibname="liblua"
-            lualinker="link_Lua63_arm64.bat"
+            lualinker="link_Lua53_arm64.bat"
             outpath="Plugins53"
             break
         ;;
@@ -34,7 +34,7 @@ done
 echo "select : $luapath"
 
 # Android/ARM, armeabi-v7a (ARMv7 VFP), Android 4.0+ (ICS)
-NDK=H:/android-ndk-r10e
+NDK=D:/android-ndk-r10e
 NDKABI=21
 NDKTRIPLE=aarch64-linux-android
 NDKVER=$NDK/toolchains/aarch64-linux-android-4.9

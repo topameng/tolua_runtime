@@ -2766,6 +2766,17 @@ LUALIB_API int lua_upvalueindex(int idx) {
 	return LUA_GLOBALSINDEX - idx;
 }
 
+#undef lua_getglobal
+LUA_API int lua_getglobal (lua_State *L, const char *name) {
+    lua_getfield(L, LUA_GLOBALSINDEX, name);
+    return 1;
+}
+
+#undef lua_setglobal
+LUA_API void lua_setglobal (lua_State *L, const char *name) {
+    lua_setfield(L, LUA_GLOBALSINDEX, name);
+}
+
 LUA_API int lua_absindex (lua_State *L, int idx) {
     return abs_index(L, idx);
 }
