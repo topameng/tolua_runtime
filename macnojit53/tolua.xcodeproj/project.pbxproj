@@ -63,7 +63,6 @@
 		84DA06C922B23B1900493874 /* unix.c in Sources */ = {isa = PBXBuildFile; fileRef = 84DA06C522B23B1900493874 /* unix.c */; };
 		84DA06CA22B23B1900493874 /* unixdgram.c in Sources */ = {isa = PBXBuildFile; fileRef = 84DA06C622B23B1900493874 /* unixdgram.c */; };
 		84DA06CD22B23B4100493874 /* unixstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 84DA06CC22B23B4100493874 /* unixstream.c */; };
-		84ED5C081C4D0749006965FF /* bit.c in Sources */ = {isa = PBXBuildFile; fileRef = 84ED5C071C4D0749006965FF /* bit.c */; };
 		84F8B8B11C45677A00AE9B8F /* pb.c in Sources */ = {isa = PBXBuildFile; fileRef = 84F8B8B01C45677A00AE9B8F /* pb.c */; };
 		84F8B8B31C45678E00AE9B8F /* tolua.c in Sources */ = {isa = PBXBuildFile; fileRef = 84F8B8B21C45678E00AE9B8F /* tolua.c */; };
 		84F8B8B51C45679700AE9B8F /* struct.c in Sources */ = {isa = PBXBuildFile; fileRef = 84F8B8B41C45679700AE9B8F /* struct.c */; };
@@ -178,7 +177,6 @@
 		84DA06C822B23B1900493874 /* unix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unix.h; sourceTree = "<group>"; };
 		84DA06CB22B23B4100493874 /* unixstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unixstream.h; sourceTree = "<group>"; };
 		84DA06CC22B23B4100493874 /* unixstream.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unixstream.c; sourceTree = "<group>"; };
-		84ED5C071C4D0749006965FF /* bit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bit.c; path = ../../bit.c; sourceTree = "<group>"; };
 		84F8B8B01C45677A00AE9B8F /* pb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pb.c; path = ../../pb.c; sourceTree = "<group>"; };
 		84F8B8B21C45678E00AE9B8F /* tolua.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tolua.c; path = ../../tolua.c; sourceTree = "<group>"; };
 		84F8B8B41C45679700AE9B8F /* struct.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = struct.c; path = ../../struct.c; sourceTree = "<group>"; };
@@ -220,7 +218,6 @@
 				842A59A21C85B76100EA2815 /* cjson */,
 				84F8B8B81C4567C100AE9B8F /* luasocket */,
 				84F8B8B61C45679C00AE9B8F /* lpeg.c */,
-				84ED5C071C4D0749006965FF /* bit.c */,
 				84F8B8B41C45679700AE9B8F /* struct.c */,
 				84F8B8B01C45677A00AE9B8F /* pb.c */,
 				849CC46A1C9846C800D4D510 /* int64.c */,
@@ -436,7 +433,6 @@
 				84D0C30122B1089200D4D723 /* lbaselib.c in Sources */,
 				84D0C31322B1089300D4D723 /* lopcodes.c in Sources */,
 				84D0C30E22B1089300D4D723 /* llex.c in Sources */,
-				84ED5C081C4D0749006965FF /* bit.c in Sources */,
 				84D0C31722B1089300D4D723 /* lstring.c in Sources */,
 				840092871CCF406200F89A56 /* io.c in Sources */,
 				84D0C31F22B1089300D4D723 /* lundump.c in Sources */,
