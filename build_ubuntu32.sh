@@ -1,12 +1,13 @@
 #!/bin/bash
 # 32 Bit Version
-# build for Ubuntu18.04
+# build for Ubuntu16.04
 mkdir -p ubuntu/x86
 luacdir="lua53"
 luajitdir="luajit-2.1"
 luapath=""
 lualibname=""
 outpath="Plugins"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 while :
 do
@@ -34,7 +35,7 @@ done
 
 echo "select : $luapath"
 
-cd $luapath
+cd $DIR/$luapath
 make clean
 
 case $luapath in 

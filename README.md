@@ -1,12 +1,14 @@
 # tolua_runtime
 **Build**<br>
 **lua5.1.5**
-pc: build_win32.sh build_win64.h  (mingw + luajit2.1.0-beta3) choose 1<br>
+windows pc: build_win32.sh build_win64.h  (mingw + luajit2.1.0-beta3) choose 1<br>
+linux pc(**ubuntu18.04 amd64**): build_ubuntu32.sh build_ubuntu64.h  (gcc + luajit2.1.0-beta3) choose 1<br>
 android: build_arm.sh build_x86.sh (mingw + luajit2.1.0-beta3) choose 1<br>
 mac: build_osx.sh (xcode + luac5.1.5 for luajit can't run on unity5) choose 1<br>
 ios: build_ios.sh (xcode + luajit2.1.0-beta3) choose 1<br>
 **lua5.3**
-pc: build_win32.sh build_win64.h  (mingw + lua5.3) choose 2<br>
+windows pc: build_win32.sh build_win64.h  (mingw + lua5.3) choose 2<br>
+linux pc: build_ubuntu32.sh(**ubuntu16.04 i386**) build_ubuntu64.h(**ubuntu18.04 amd64**)  (gcc + lua5.3) choose 2<br>
 android: build_arm.sh build_x86.sh (mingw + lua5.3) choose 2<br>
 mac: build_osx.sh (xcode + lua5.3 ) choose 2<br>
 ios: build_ios.sh (xcode + lua5.3 ) choose 2<br>

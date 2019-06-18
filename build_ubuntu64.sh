@@ -7,10 +7,11 @@ luajitdir="luajit-2.1"
 luapath=""
 lualibname=""
 outpath="Plugins"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 while :
 do
-    echo "Please choose (1¡¢luajit; 2¡¢lua5.3)"
+    echo "Please choose (1)luajit; (2)lua5.3"
     read input
     case $input in
         "1")
@@ -34,7 +35,7 @@ done
 
 echo "select : $luapath"
 
-cd $luapath
+cd $DIR/$luapath
 make clean
 
 case $luapath in 
