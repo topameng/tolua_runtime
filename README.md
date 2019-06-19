@@ -35,4 +35,4 @@ http://www.inf.puc-rio.br/~roberto/lpeg/lpeg.html
 # 关于mac上编译iOS 32位runtime库
 * 苹果系统升级到xcode10后，移除了编译32位lib的支持，如果有需求编译支持32位版本的runtime库，请用xcode9.4.1编译，目前默认原生的编译好的都是同时支持32、64位的runtime fat lib
 
-[runtime库编译文档](https://github.com/NewbieGameCoder/tolua_runtime/wiki)
+# [runtime库编译文档](https://github.com/NewbieGameCoder/tolua_runtime/wiki)
