@@ -4,6 +4,7 @@ luapath=""
 lualibname=""
 lualinkpath=""
 outpath="Plugins"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 while :
 do
@@ -32,7 +33,7 @@ do
 done
 
 echo "select : $luapath"
-cd $luapath/src
+cd $DIR/$luapath/src
 
 # Android/x86, x86 (i686 SSE3), Android 4.0+ (ICS)
 NDK=D:/android-ndk-r10e

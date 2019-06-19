@@ -6,6 +6,7 @@ luajitdir="luajit-2.1"
 luapath=""
 lualibname=""
 outpath="Plugins"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 while :
 do
@@ -33,7 +34,7 @@ done
 
 echo "select : $luapath"
 
-cd $luapath
+cd $DIR/$luapath
 mingw32-make clean
 
 case $luapath in 

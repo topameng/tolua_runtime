@@ -4,6 +4,7 @@ luapath=""
 lualibname=""
 lualinkpath=""
 outpath=""
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 while :
 do
@@ -32,7 +33,7 @@ do
 done
 
 echo "select : $luapath"
-cd $luapath/src
+cd $DIR/$luapath/src
 
 # Android/ARM, armeabi-v7a (ARMv7 VFP), Android 4.0+ (ICS)
 NDK=D:/android-ndk-r10e
