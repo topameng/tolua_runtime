@@ -1414,6 +1414,10 @@ LUALIB_API void tolua_function(lua_State *L, const char *name, lua_CFunction fn)
   	lua_pushstring(L, name);
     tolua_pushcfunction(L, fn);
   	lua_rawset(L, -3);
+
+    /*lua_pushstring(L, name);
+    lua_pushcfunction(L, fn);
+    lua_rawset(L, -3);*/
 }
 
 static int tolua_lazyclosure(lua_State *L)
