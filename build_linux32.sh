@@ -1,13 +1,13 @@
 #!/bin/bash
 # 32 Bit Version
 # build for Ubuntu16.04
-mkdir -p ubuntu/x86
 luacdir="lua53"
 luajitdir="luajit-2.1"
 luapath=""
 lualibname=""
 outpath="Plugins"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+mkdir -p $DIR/ubuntu/x86
 
 while :
 do

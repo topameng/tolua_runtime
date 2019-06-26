@@ -1,13 +1,13 @@
 #!/bin/bash
 # 64 Bit Version
 # build for Ubuntu18.04
-mkdir -p ubuntu/x86_64
 luacdir="lua53"
 luajitdir="luajit-2.1"
 luapath=""
 lualibname=""
 outpath="Plugins"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+mkdir -p $DIR/ubuntu/x86_64
 
 while :
 do
