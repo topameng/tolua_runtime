@@ -31,11 +31,11 @@ SOFTWARE.
 #include <errno.h>
 #include <ctype.h>
 
-#include "lua.h"
+#include "tolua.h"
 #include "lualib.h"
 #include "lauxlib.h"
-#include "tolua.h"
 
+#if LUA_VERSION_NUM == 501
 static bool _isint64(lua_State* L, int pos)
 {
     if (lua_getmetatable(L, pos))
@@ -48,6 +48,7 @@ static bool _isint64(lua_State* L, int pos)
     
     return false;
 }
+#endif
 
 bool _str2long(const char *s, int64_t* result) 
 {
@@ -77,7 +78,20 @@ LUALIB_API bool tolua_isint64(lua_State* L, int pos)
 {
     int64_t num;
 
-    if (lua_type(L, pos) == LUA_TNUMBER)
+#if LUA_VERSION_NUM == 501
+    int type = lua_type(L, pos);
+    if (type == LUA_TNUMBER)
+    {
+        return true;
+    }
+    else if (type == LUA_TSTRING && _str2long(lua_tostring(L, pos), &num))
+    {
+        return true;
+    }
+
+    return _isint64(L, pos);
+#else
+    if (lua_isinteger(L, pos))
     {
         return true;
     }
@@ -86,22 +100,20 @@ LUALIB_API bool tolua_isint64(lua_State* L, int pos)
         return true;
     }
 
-    return _isint64(L, pos);
+    return false;
+#endif
 }
 
 LUALIB_API void tolua_pushint64(lua_State* L, int64_t n)
 {
-    /*if (toluaflags & FLAG_INT64)    
-    {
-        lua_pushinteger(L, (lua_Integer)n);
-    }
-    else
-    {*/
-        int64_t* p = (int64_t*)lua_newuserdata(L, sizeof(int64_t));
-        *p = n;
-        lua_getref(L, LUA_RIDX_INT64);
-        lua_setmetatable(L, -2);            
-    //}
+#if LUA_VERSION_NUM == 501
+    int64_t* p = (int64_t*)lua_newuserdata(L, sizeof(int64_t));
+    *p = n;
+    lua_getref(L, LUA_RIDX_INT64);
+    lua_setmetatable(L, -2);            
+#else
+    lua_pushinteger(L, n);
+#endif
 }
 
 //转换一个字符串为 int64
@@ -130,12 +142,13 @@ static int64_t _long(lua_State* L, int pos)
 LUALIB_API int64_t tolua_toint64(lua_State* L, int pos)
 {
     int64_t n = 0;
+#if LUA_VERSION_NUM == 501
     int type = lua_type(L, pos);
 
     switch(type) 
     {
         case LUA_TNUMBER:         
-            n = (int64_t)lua_tonumber(L, pos);        
+            n = (int64_t)lua_tonumber(L, pos);
             break;    
         case LUA_TSTRING: 
             if (!_str2long(lua_tostring(L, pos), &n))
@@ -152,6 +165,9 @@ LUALIB_API int64_t tolua_toint64(lua_State* L, int pos)
         default:        
             break;
     }
+#else
+    n = (int64_t)lua_tointeger(L, pos);
+#endif
 
     return n;
 }
@@ -159,6 +175,7 @@ LUALIB_API int64_t tolua_toint64(lua_State* L, int pos)
 static int64_t tolua_checkint64(lua_State* L, int pos)
 {
     int64_t n = 0;
+#if LUA_VERSION_NUM == 501
     int type = lua_type(L, pos);
     
     switch(type)
@@ -178,10 +195,14 @@ static int64_t tolua_checkint64(lua_State* L, int pos)
         default:
             return luaL_typerror(L, pos, "long");
     }
+#else
+    n = (int64_t)luaL_checkinteger(L, pos);
+#endif
     
     return n;
 }
 
+#if LUA_VERSION_NUM == 501
 static int _int64add(lua_State* L)
 {
     int64_t lhs = tolua_checkint64(L, 1);    
@@ -275,14 +296,6 @@ static int _int64eq(lua_State* L)
     return 1;
 }
 
-static int _int64equals(lua_State* L)
-{
-    int64_t lhs = tolua_checkint64(L, 1);
-    int64_t rhs = tolua_toint64(L, 2);
-    lua_pushboolean(L, lhs == rhs);
-    return 1;
-}
-
 static int _int64lt(lua_State* L)
 {
     int64_t lhs = tolua_checkint64(L, 1); 
@@ -298,6 +311,7 @@ static int _int64le(lua_State* L)
     lua_pushboolean(L, lhs <= rhs);
     return 1;
 }
+#endif
 
 static int _int64tostring(lua_State* L)
 {    
@@ -313,6 +327,14 @@ static int _int64tostring(lua_State* L)
     return 1;
 }
 
+static int _int64equals(lua_State* L)
+{
+    int64_t lhs = tolua_checkint64(L, 1);
+    int64_t rhs = tolua_toint64(L, 2);
+    lua_pushboolean(L, lhs == rhs);
+    return 1;
+}
+
 static int _int64tonum2(lua_State* L)
 {
     if (!tolua_isint64(L, 1))
@@ -322,19 +344,21 @@ static int _int64tonum2(lua_State* L)
 
     int64_t n = tolua_toint64(L, 1);
 
+    uint32_t high = 0;        
+    uint32_t low = 0;
     //作为无符号数拆分
     if (n != 0)
     {
-        uint32_t high = n >> 32;        
-        uint32_t low = n & 0xFFFFFFFF;
-        lua_pushnumber(L, low);
-        lua_pushnumber(L, high);
+        high = n >> 32;        
+        low = n & 0xFFFFFFFF;
     }
-    else
-    {
-        lua_pushnumber(L, 0);
-        lua_pushnumber(L, 0);
-    }
+#if LUA_VERSION_NUM == 501
+    lua_pushnumber(L, low);
+    lua_pushnumber(L, high);
+#else
+    lua_pushinteger(L, low);
+    lua_pushinteger(L, high);
+#endif
 
     return 2;
 }
@@ -350,8 +374,13 @@ int tolua_newint64(lua_State* L)
     }
     else if (type == LUA_TNUMBER)
     {
+    #if LUA_VERSION_NUM == 501
         int64_t n1 = (int64_t)luaL_checknumber(L, 1);
         int64_t n2 = (int64_t)lua_tonumber(L, 2);
+    #else
+        int64_t n1 = (int64_t)luaL_checkinteger(L, 1);
+        int64_t n2 = (int64_t)lua_tointeger(L, 2);
+    #endif
 
         if (n1 < 0 || n1 > UINT_MAX)
         {
@@ -383,6 +412,7 @@ void tolua_openint64(lua_State* L)
     lua_rawset(L, -3);
     lua_pop(L, 1);
 
+#if LUA_VERSION_NUM == 501
     lua_pushstring(L, "__add"),
     lua_pushcfunction(L, _int64add);
     lua_rawset(L, -3);
@@ -415,10 +445,6 @@ void tolua_openint64(lua_State* L)
     lua_pushcfunction(L, _int64tostring);
     lua_rawset(L, -3);      
 
-    lua_pushstring(L, "tostring");
-    lua_pushcfunction(L, _int64tostring);
-    lua_rawset(L, -3);     
-
     lua_pushstring(L, "__eq");
     lua_pushcfunction(L, _int64eq);
     lua_rawset(L, -3);  
@@ -430,6 +456,7 @@ void tolua_openint64(lua_State* L)
     lua_pushstring(L, "__le");
     lua_pushcfunction(L, _int64le);
     lua_rawset(L, -3);     
+#endif
 
     lua_pushstring(L, ".name");
     lua_pushstring(L, "int64");
@@ -446,6 +473,10 @@ void tolua_openint64(lua_State* L)
     lua_pushstring(L, "tonum2");
     lua_pushcfunction(L, _int64tonum2);
     lua_rawset(L, -3);        
+
+    lua_pushstring(L, "tostring");
+    lua_pushcfunction(L, _int64tostring);
+    lua_rawset(L, -3);     
 
     lua_pushstring(L, "__index");
     lua_pushvalue(L, -2);

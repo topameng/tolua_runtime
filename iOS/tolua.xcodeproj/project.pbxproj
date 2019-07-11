@@ -34,6 +34,7 @@
 		840092EF1CCF45A800F89A56 /* unix.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092DB1CCF45A800F89A56 /* unix.c */; };
 		840092F01CCF45A800F89A56 /* usocket.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092DD1CCF45A800F89A56 /* usocket.c */; };
 		8445EB151D4C9F8A00397F5E /* uint64.c in Sources */ = {isa = PBXBuildFile; fileRef = 8445EB141D4C9F8A00397F5E /* uint64.c */; };
+		847FD89E22B37C3B00A92ACA /* compat.c in Sources */ = {isa = PBXBuildFile; fileRef = 847FD89D22B37C3B00A92ACA /* compat.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -96,6 +97,8 @@
 		840092DD1CCF45A800F89A56 /* usocket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = usocket.c; sourceTree = "<group>"; };
 		840092DE1CCF45A800F89A56 /* usocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = usocket.h; sourceTree = "<group>"; };
 		8445EB141D4C9F8A00397F5E /* uint64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uint64.c; path = ../../uint64.c; sourceTree = "<group>"; };
+		847FD89C22B37C3B00A92ACA /* compat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compat.h; sourceTree = "<group>"; };
+		847FD89D22B37C3B00A92ACA /* compat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = compat.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +163,8 @@
 		840092BD1CCF45A800F89A56 /* luasocket */ = {
 			isa = PBXGroup;
 			children = (
+				847FD89D22B37C3B00A92ACA /* compat.c */,
+				847FD89C22B37C3B00A92ACA /* compat.h */,
 				840092BE1CCF45A800F89A56 /* auxiliar.c */,
 				840092BF1CCF45A800F89A56 /* auxiliar.h */,
 				840092C01CCF45A800F89A56 /* buffer.c */,
@@ -266,6 +271,7 @@
 				840092EC1CCF45A800F89A56 /* tcp.c in Sources */,
 				840092F01CCF45A800F89A56 /* usocket.c in Sources */,
 				840092EF1CCF45A800F89A56 /* unix.c in Sources */,
+				847FD89E22B37C3B00A92ACA /* compat.c in Sources */,
 				840092AA1CCF450F00F89A56 /* int64.c in Sources */,
 				840092ED1CCF45A800F89A56 /* timeout.c in Sources */,
 				840092E11CCF45A800F89A56 /* auxiliar.c in Sources */,

@@ -28,6 +28,8 @@
 		842A59AB1C85B76100EA2815 /* strbuf.c in Sources */ = {isa = PBXBuildFile; fileRef = 842A59A61C85B76100EA2815 /* strbuf.c */; };
 		8445EB131D4C9D2100397F5E /* uint64.c in Sources */ = {isa = PBXBuildFile; fileRef = 8445EB121D4C9D2100397F5E /* uint64.c */; };
 		849CC46B1C9846C800D4D510 /* int64.c in Sources */ = {isa = PBXBuildFile; fileRef = 849CC46A1C9846C800D4D510 /* int64.c */; };
+		84DA06D222B23C1B00493874 /* unixdgram.c in Sources */ = {isa = PBXBuildFile; fileRef = 84DA06D022B23C1A00493874 /* unixdgram.c */; };
+		84DA06D322B23C1B00493874 /* unixstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 84DA06D122B23C1B00493874 /* unixstream.c */; };
 		84ED5C081C4D0749006965FF /* bit.c in Sources */ = {isa = PBXBuildFile; fileRef = 84ED5C071C4D0749006965FF /* bit.c */; };
 		84EF238C1C4CCD3F0093A49A /* lapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 84EF23551C4CCD3F0093A49A /* lapi.c */; };
 		84EF238D1C4CCD3F0093A49A /* lauxlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 84EF23571C4CCD3F0093A49A /* lauxlib.c */; };
@@ -109,6 +111,10 @@
 		842A59A71C85B76100EA2815 /* strbuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strbuf.h; sourceTree = "<group>"; };
 		8445EB121D4C9D2100397F5E /* uint64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uint64.c; path = ../../uint64.c; sourceTree = "<group>"; };
 		849CC46A1C9846C800D4D510 /* int64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = int64.c; path = ../../int64.c; sourceTree = "<group>"; };
+		84DA06CE22B23C1A00493874 /* unixstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unixstream.h; sourceTree = "<group>"; };
+		84DA06CF22B23C1A00493874 /* unixdgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unixdgram.h; sourceTree = "<group>"; };
+		84DA06D022B23C1A00493874 /* unixdgram.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unixdgram.c; sourceTree = "<group>"; };
+		84DA06D122B23C1B00493874 /* unixstream.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unixstream.c; sourceTree = "<group>"; };
 		84ED5C071C4D0749006965FF /* bit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bit.c; path = ../../bit.c; sourceTree = "<group>"; };
 		84EF23551C4CCD3F0093A49A /* lapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lapi.c; sourceTree = "<group>"; };
 		84EF23561C4CCD3F0093A49A /* lapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lapi.h; sourceTree = "<group>"; };
@@ -299,6 +305,10 @@
 		84F8B8B81C4567C100AE9B8F /* luasocket */ = {
 			isa = PBXGroup;
 			children = (
+				84DA06D022B23C1A00493874 /* unixdgram.c */,
+				84DA06CF22B23C1A00493874 /* unixdgram.h */,
+				84DA06D122B23C1B00493874 /* unixstream.c */,
+				84DA06CE22B23C1A00493874 /* unixstream.h */,
 				840092611CCF406200F89A56 /* auxiliar.c */,
 				840092621CCF406200F89A56 /* auxiliar.h */,
 				840092631CCF406200F89A56 /* buffer.c */,
@@ -409,6 +419,8 @@
 				840092861CCF406200F89A56 /* inet.c in Sources */,
 				84EF23981C4CCD3F0093A49A /* llex.c in Sources */,
 				840092901CCF406200F89A56 /* unix.c in Sources */,
+				84DA06D322B23C1B00493874 /* unixstream.c in Sources */,
+				84DA06D222B23C1B00493874 /* unixdgram.c in Sources */,
 				84F8B8B71C45679C00AE9B8F /* lpeg.c in Sources */,
 				840092831CCF406200F89A56 /* buffer.c in Sources */,
 				849CC46B1C9846C800D4D510 /* int64.c in Sources */,
@@ -557,7 +569,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-all_load";
 				PRODUCT_NAME = tolua;
-				VALID_ARCHS = "x86_64 i386";
+				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = bundle;
 			};
 			name = Debug;
@@ -581,7 +593,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-all_load";
 				PRODUCT_NAME = tolua;
-				VALID_ARCHS = "x86_64 i386";
+				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = bundle;
 			};
 			name = Release;

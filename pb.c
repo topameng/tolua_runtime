@@ -157,11 +157,12 @@ static void pack_varint(luaL_Buffer *b, uint64_t value)
 static int64_t _long(lua_State* L, int pos)
 {
     int64_t n = 0;
+#if LUA_VERSION_NUM == 501
     int type = lua_type(L, pos);
 
     if (type == LUA_TNUMBER)
     {
-        n = (int64_t)lua_tonumber(L, pos);        
+        n = (int64_t)lua_tonumber(L, pos);    
     }
     else if (type == LUA_TSTRING)
     {
@@ -178,13 +179,17 @@ static int64_t _long(lua_State* L, int pos)
 
         errno = old;
     }
-    
+#else
+    n = (int64_t)lua_tointeger(L, pos);
+#endif
+
     return n;
 }
 
 static uint64_t _ulong(lua_State* L, int pos)
 {
     uint64_t n = 0;
+#if LUA_VERSION_NUM == 501
     int type = lua_type(L, pos);
 
     if (type == LUA_TNUMBER)
@@ -206,13 +211,20 @@ static uint64_t _ulong(lua_State* L, int pos)
 
         errno = old;
     }
+#else
+    n = (uint64_t)lua_tointeger(L, pos);
+#endif
         
     return n;
 }
 
 static int varint_encoder(lua_State *L)
 {
+#if LUA_VERSION_NUM == 501
     lua_Number l_value = luaL_checknumber(L, 2);
+#else
+    lua_Integer l_value = luaL_checkinteger(L, 2);
+#endif
     uint64_t value = (uint64_t)l_value;
 
     luaL_Buffer b;
@@ -243,7 +255,11 @@ static int varint_encoder64(lua_State *L)
 
 static int signed_varint_encoder(lua_State *L)
 {
+#if LUA_VERSION_NUM == 501
     lua_Number l_value = luaL_checknumber(L, 2);
+#else
+    lua_Integer l_value = luaL_checkinteger(L, 2);
+#endif
     int64_t value = (int64_t)l_value;
     
     luaL_Buffer b;
@@ -316,7 +332,11 @@ static int struct_pack(lua_State *L)
     {
         case 'i':
             {
+#if LUA_VERSION_NUM == 501
                 lua_Number value = luaL_checknumber(L, 3);
+#else
+                lua_Integer value = luaL_checkinteger(L, 3);
+#endif
                 lua_settop(L, 1);
                 int32_t v = (int32_t)value;
                 pack_fixed32(L, (uint8_t*)&v);
@@ -347,7 +367,11 @@ static int struct_pack(lua_State *L)
             }
         case 'I':
             {
+#if LUA_VERSION_NUM == 501
                 lua_Number value = luaL_checknumber(L, 3);
+#else
+                lua_Integer value = luaL_checkinteger(L, 3);
+#endif
                 lua_settop(L, 1);
                 uint32_t v = (uint32_t)value;
                 pack_fixed32(L, (uint8_t*)&v);
@@ -408,7 +432,11 @@ static int varint_decoder(lua_State *L)
     }
     else
     {
+#if LUA_VERSION_NUM == 501
         lua_pushnumber(L, (lua_Number)unpack_varint(buffer, len));
+#else
+        lua_pushinteger(L, (lua_Integer)unpack_varint(buffer, len));
+#endif
         lua_pushinteger(L, len + pos);
     }
     return 2;
@@ -450,7 +478,11 @@ static int signed_varint_decoder(lua_State *L)
     }
     else
     {
+#if LUA_VERSION_NUM == 501
         lua_pushnumber(L, (lua_Number)(int64_t)unpack_varint(buffer, len));
+#else
+        lua_pushinteger(L, (lua_Integer)(int64_t)unpack_varint(buffer, len));
+#endif
         lua_pushinteger(L, len + pos);
     }
     return 2;
@@ -499,7 +531,11 @@ static int64_t  maxint  = (((int64_t)1) << (8*sizeof(int32_t)-1)) - 1;
 
 static int zig_zag_encode64(lua_State *L)
 {
+#if LUA_VERSION_NUM == 501
     int64_t n = (int64_t)luaL_checknumber(L, 1);
+#else
+    int64_t n = (int64_t)luaL_checkinteger(L, 1);
+#endif
     uint64_t value = (n << 1) ^ (n >> 63);
 
     if (sizeof(lua_Integer) < 8 && value > umaxint) 
@@ -518,7 +554,11 @@ static int zig_zag_encode64(lua_State *L)
 
 static int zig_zag_decode64(lua_State *L)
 {
+#if LUA_VERSION_NUM == 501
     uint64_t n = (uint64_t)luaL_checknumber(L, 1);
+#else
+    uint64_t n = (uint64_t)luaL_checkinteger(L, 1);
+#endif
     int64_t value = (n >> 1) ^ - (int64_t)(n & 1);
 
     if (sizeof(lua_Integer) < 8 && (value > maxint || value < (-maxint-1))) 
@@ -612,7 +652,11 @@ static int struct_unpack(lua_State *L)
             }
         case 'I':
             {
+#if LUA_VERSION_NUM == 501
                 lua_pushnumber(L, (lua_Number)__uld32(unpack_fixed32(buffer, out)));
+#else
+                lua_pushinteger(L, (lua_Integer)__uld32(unpack_fixed32(buffer, out)));
+#endif
                 break;
             }
         case 'Q':
@@ -691,20 +735,26 @@ static int iostring_clear(lua_State* L)
     return 0;
 }
 
+#if LUA_VERSION_NUM == 501
+#define lua_pushint lua_pushnumber
+#else
+#define lua_pushint lua_pushinteger
+#endif
+
 static int varint_size(lua_State* L) 
 {
     uint64_t value = _ulong(L, 1);
 
-    if (value <= 0x7f) lua_pushnumber(L, 1);
-    else if (value <= 0x3fff) lua_pushnumber(L, 2);
-    else if (value <= 0x1fffff) lua_pushnumber(L, 3);
-    else if (value <= 0xfffffff) lua_pushnumber(L, 4);
-    else if (value <= 0x7ffffffff) lua_pushnumber(L, 5);
-    else if (value <= 0x3ffffffffff) lua_pushnumber(L, 6);
-    else if (value <= 0x1ffffffffffff) lua_pushnumber(L, 7);
-    else if (value <= 0xffffffffffffff) lua_pushnumber(L, 8);
-    else if (value <= 0x7fffffffffffffff) lua_pushnumber(L, 9);
-    else lua_pushnumber(L, 10);    
+    if (value <= 0x7f) lua_pushint(L, 1);
+    else if (value <= 0x3fff) lua_pushint(L, 2);
+    else if (value <= 0x1fffff) lua_pushint(L, 3);
+    else if (value <= 0xfffffff) lua_pushint(L, 4);
+    else if (value <= 0x7ffffffff) lua_pushint(L, 5);
+    else if (value <= 0x3ffffffffff) lua_pushint(L, 6);
+    else if (value <= 0x1ffffffffffff) lua_pushint(L, 7);
+    else if (value <= 0xffffffffffffff) lua_pushint(L, 8);
+    else if (value <= 0x7fffffffffffffff) lua_pushint(L, 9);
+    else lua_pushint(L, 10);    
 
     return 1;
 }
@@ -713,17 +763,16 @@ static int signed_varint_size(lua_State* L)
 {
     int64_t value = _long(L, 1);
 
-    if (value < 0) lua_pushnumber(L, 10);
-    else if (value <= 0x7f) lua_pushnumber(L, 1);
-    else if (value <= 0x3fff) lua_pushnumber(L, 2);
-    else if (value <= 0x1fffff) lua_pushnumber(L, 3);
-    else if (value <= 0xfffffff) lua_pushnumber(L, 4);
-    else if (value <= 0x7ffffffff) lua_pushnumber(L, 5);
-    else if (value <= 0x3ffffffffff) lua_pushnumber(L, 6);
-    else if (value <= 0x1ffffffffffff) lua_pushnumber(L, 7);
-    else if (value <= 0xffffffffffffff) lua_pushnumber(L, 8);
-    else if (value <= 0x7fffffffffffffff) lua_pushnumber(L, 9);
-    else lua_pushnumber(L, 10);    
+    if (value < 0) lua_pushint(L, 10);
+    else if (value <= 0x7f) lua_pushint(L, 1);
+    else if (value <= 0x3fff) lua_pushint(L, 2);
+    else if (value <= 0x1fffff) lua_pushint(L, 3);
+    else if (value <= 0xfffffff) lua_pushint(L, 4);
+    else if (value <= 0x7ffffffff) lua_pushint(L, 5);
+    else if (value <= 0x3ffffffffff) lua_pushint(L, 6);
+    else if (value <= 0x1ffffffffffff) lua_pushint(L, 7);
+    else if (value <= 0xffffffffffffff) lua_pushint(L, 8);
+    else lua_pushint(L, 9);
 
     return 1;
 }
@@ -766,8 +815,23 @@ LUALIB_API int luaopen_pb (lua_State *L)
     luaL_newmetatable(L, IOSTRING_META);
     lua_pushvalue(L, -1);
     lua_setfield(L, -2, "__index");
-    luaL_register(L, NULL, _c_iostring_m);
+#if LUA_VERSION_NUM == 501
+    luaL_register(L, NULL, _c_iostring_m);     
+    luaL_register(L, "pb", _pb);    
+#else 
+    luaL_newlib(L, _c_iostring_m);
+    luaL_newlib(L, _pb);
 
-    luaL_register(L, "pb", _pb);
+    lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED");
+    lua_getfield(L, -1, "pb");  /* LOADED[name] */
+    if (!lua_toboolean(L, -1))  /* is it there? */
+    {
+        lua_pop(L, 1);          /* pop getfield result */
+        lua_pushvalue(L, -2);
+        lua_setfield(L, -2, "pb");
+        lua_setglobal(L, "pb");
+    }
+    else lua_pop(L, 3);
+#endif
     return 1;
 } 

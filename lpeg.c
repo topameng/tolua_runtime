@@ -24,9 +24,9 @@
 
 
 /*
-** compatibility with Lua 5.2
+** compatibility with Lua 5.2、Lua 5.3
 */
-#if (LUA_VERSION_NUM == 502)
+#if (LUA_VERSION_NUM > 501)
 
 #undef lua_equal
 #define lua_equal(L,idx1,idx2)  lua_compare(L,(idx1),(idx2),LUA_OPEQ)
@@ -35,6 +35,10 @@
 #define lua_getfenv	lua_getuservalue
 #undef lua_setfenv
 #define lua_setfenv	lua_setuservalue
+#if !defined(LUA_COMPAT_APIINTCASTS)
+#define luaL_checkint(L,n)	((int)luaL_checkinteger(L, (n)))
+#define luaL_optint(L,n,d)	((int)luaL_optinteger(L, (n), (d)))
+#endif
 
 #undef lua_objlen
 #define lua_objlen	lua_rawlen
@@ -2392,6 +2396,9 @@ int luaopen_lpeg (lua_State *L) {
   lua_setfield(L, LUA_REGISTRYINDEX, MAXSTACKIDX);
   luaL_register(L, NULL, metapattreg);
   luaL_register(L, "lpeg", pattreg);
+#if (LUA_VERSION_NUM > 501)
+  lua_setglobal(L, "lpeg");
+#endif
   lua_pushliteral(L, "__index");
   lua_pushvalue(L, -2);
   lua_settable(L, -4);

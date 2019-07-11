@@ -1,5 +1,6 @@
 ﻿#ifndef tolua_h
 #define tolua_h
+#include "lua.h"
 
 #if !defined(LUA_RIDX_MAINTHREAD)
 #define LUA_RIDX_MAINTHREAD	1
@@ -53,5 +54,28 @@ void tolua_openuint64(lua_State* L);
 int  tolua_newuint64(lua_State* L);
 
 extern int toluaflags;
+
+#if LUA_VERSION_NUM == 501
+LUA_API void (lua_pushglobaltable) (lua_State *L);
+LUA_API int  (lua_absindex) (lua_State *L, int idx);
+#else
+
+#undef lua_getfenv
+#define lua_getfenv	lua_getuservalue
+#undef lua_setfenv
+#define lua_setfenv	lua_setuservalue
+#undef lua_objlen
+#define lua_objlen	lua_rawlen
+#undef lua_getref
+#define lua_getref(L, ref) lua_rawgeti(L, LUA_REGISTRYINDEX, ref)
+
+// LUA_API int     (lua_setfenv) (lua_State *L, int idx);
+// LUA_API void    (lua_getfenv) (lua_State *L, int idx);
+LUA_API int     (luaL_typerror) (lua_State *L, int narg, const char *tname);
+
+// #if !defined(LUA_COMPAT_MODULE)
+// LUA_API void    (luaL_register) (lua_State*L, const char*libname, const luaL_Reg*l);
+// #endif
+#endif
 
 #endif

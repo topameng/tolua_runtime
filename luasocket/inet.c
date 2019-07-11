@@ -2,15 +2,12 @@
 * Internet domain functions
 * LuaSocket toolkit
 \*=========================================================================*/
+#include "luasocket.h"
+#include "inet.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "lua.h"
-#include "lauxlib.h"
-#include "compat.h"
-
-#include "inet.h"
 
 /*=========================================================================*\
 * Internal function prototypes.
@@ -32,9 +29,6 @@ static luaL_Reg func[] = {
     { NULL, NULL}
 };
 
-/*=========================================================================*\
-* Exported functions
-\*=========================================================================*/
 /*-------------------------------------------------------------------------*\
 * Initializes module
 \*-------------------------------------------------------------------------*/
@@ -42,7 +36,7 @@ int inet_open(lua_State *L)
 {
     lua_pushstring(L, "dns");
     lua_newtable(L);
-    luaL_setfuncs(L, func, 0);
+    luasocket_setfuncs(L, func, 0);
     lua_settable(L, -3);
     return 0;
 }

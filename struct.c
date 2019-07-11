@@ -392,6 +392,9 @@ LUALIB_API int luaopen_struct (lua_State *L);
 
 LUALIB_API int luaopen_struct (lua_State *L) {
   luaL_register(L, "struct", thislib);
+#if LUA_VERSION_NUM >= 502
+  lua_setglobal(L, "struct");
+#endif
   return 1;
 }
 

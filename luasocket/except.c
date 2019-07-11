@@ -2,13 +2,9 @@
 * Simple exception support
 * LuaSocket toolkit
 \*=========================================================================*/
-#include <stdio.h>
-
-#include "lua.h"
-#include "lauxlib.h"
-#include "compat.h"
-
+#include "luasocket.h"
 #include "except.h"
+#include <stdio.h>
 
 #if LUA_VERSION_NUM < 502
 #define lua_pcallk(L, na, nr, err, ctx, cont) \
@@ -128,6 +124,6 @@ int except_open(lua_State *L) {
     lua_newtable(L); /* metatable for wrapped exceptions */
     lua_pushboolean(L, 0);
     lua_setfield(L, -2, "__metatable");
-    luaL_setfuncs(L, func, 1);
+    luasocket_setfuncs(L, func, 1);
     return 0;
 }
