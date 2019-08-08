@@ -350,8 +350,8 @@ int tolua_newuint64(lua_State *L)
     }
     else if (type == LUA_TNUMBER)
     {
-        uint64_t n1 = (uint64_t)luaL_checknumber(L, 1);
-        uint64_t n2 = (uint64_t)lua_tonumber(L, 2);
+        int64_t n1 = (int64_t)luaL_checknumber(L, 1);
+        int64_t n2 = (int64_t)lua_tonumber(L, 2);
 
         if (n1 < 0 || n1 > UINT_MAX)
         {

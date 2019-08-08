@@ -150,6 +150,7 @@ static void *err_unwind(lua_State *L, void *stopcf, int errcode)
     case FRAME_CONT:  /* Continuation frame. */
       if (frame_iscont_fficb(frame))
 	goto unwind_c;
+      /* fallthrough */
     case FRAME_VARG:  /* Vararg frame. */
       frame = frame_prevd(frame);
       break;
@@ -234,6 +235,9 @@ LJ_FUNCA int lj_err_unwind_dwarf(int version, int actions,
     return _URC_FATAL_PHASE1_ERROR;
   UNUSED(uexclass);
   cf = (void *)_Unwind_GetCFA(ctx);
+#ifdef LJ_TARGET_S390X
+  cf -= 160; /* CFA points 160 bytes above r15. */
+#endif
   L = cframe_L(cf);
   if ((actions & _UA_SEARCH_PHASE)) {
 #if LJ_UNWIND_EXT
@@ -508,6 +512,7 @@ LJ_NOINLINE void LJ_FASTCALL lj_err_throw(lua_State *L, int errcode)
 {
   global_State *g = G(L);
   lj_trace_abort(g);
+  g->saved_jit_base = g->jit_base;
   setmref(g->jit_base, NULL);
   L->status = LUA_OK;
 #if LJ_UNWIND_EXT

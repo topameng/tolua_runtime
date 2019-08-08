@@ -1666,7 +1666,7 @@ LUALIB_API int tolua_getclassref(lua_State *L, int pos)
     lua_getmetatable(L, pos);           //mt
     lua_pushstring(L, ".ref");          //mt .ref
     lua_rawget(L, -2);                  //mt ref
-    int ref = lua_tointeger(L, -1);         
+    int ref = (int)lua_tointeger(L, -1);         
     return ref;
 }
 

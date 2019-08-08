@@ -1,7 +1,7 @@
 cd luajit-2.1/src
 
 # Android/ARM, armeabi-v7a (ARMv7 VFP), Android 4.0+ (ICS)
-NDK=D:/android-ndk-r10e
+NDK=D:/android-ndk-r15c
 NDKABI=21
 NDKTRIPLE=aarch64-linux-android
 NDKVER=$NDK/toolchains/aarch64-linux-android-4.9
@@ -20,8 +20,8 @@ if [[ "$OSTYPE" == "msys" ]]; then
 	cmd /c "link_arm64.bat"
 else
 	cd ../../android
-	$NDK/ndk-build clean APP_ABI="armeabi-v7a,x86,arm64-v8a"
-	$NDK/ndk-build APP_ABI="arm64-v8a"
+	$NDK/ndk-build clean APP_ABI="armeabi-v7a,x86,arm64-v8a" APP_PLATFORM=android-21
+	$NDK/ndk-build APP_ABI="arm64-v8a" APP_PLATFORM=android-21
 	cp libs/arm64-v8a/libtolua.so ../Plugins/Android/libs/arm64-v8a
-	$NDK/ndk-build clean APP_ABI="armeabi-v7a,x86,arm64-v8a"
+	$NDK/ndk-build clean APP_ABI="armeabi-v7a,x86,arm64-v8a" APP_PLATFORM=android-21
 fi
