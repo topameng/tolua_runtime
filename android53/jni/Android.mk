@@ -17,7 +17,11 @@ LOCAL_SRC_FILES :=	../../tolua.c \
 					../../int64.c \
 					../../uint64.c \
 					../../pb.c \
-					../../lpeg.c \
+					../../lpeg/lpcap.c \
+					../../lpeg/lpcode.c \
+					../../lpeg/lpprint.c \
+					../../lpeg/lptree.c \
+					../../lpeg/lpvm.c \
 					../../struct.c \
 					../../cjson/strbuf.c \
 					../../cjson/lua_cjson.c \

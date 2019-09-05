@@ -35,8 +35,7 @@
 #define lua_rawlen		lua_objlen
 
 #define luaL_setfuncs(L,f,n)	luaL_register(L,NULL,f)
-#define luaL_newlib(L,f)	luaL_register(L,"lpeg",f)
-
+//#define luaL_newlib(L,f)	luaL_register(L,"lpeg",f)
 #endif
 
 

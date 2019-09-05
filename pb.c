@@ -815,23 +815,12 @@ LUALIB_API int luaopen_pb (lua_State *L)
     luaL_newmetatable(L, IOSTRING_META);
     lua_pushvalue(L, -1);
     lua_setfield(L, -2, "__index");
-#if LUA_VERSION_NUM == 501
+#if LUA_VERSION_NUM < 502
     luaL_register(L, NULL, _c_iostring_m);     
     luaL_register(L, "pb", _pb);    
-#else 
-    luaL_newlib(L, _c_iostring_m);
+#else     
+    luaL_setfuncs(L, _c_iostring_m, 0);
     luaL_newlib(L, _pb);
-
-    lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED");
-    lua_getfield(L, -1, "pb");  /* LOADED[name] */
-    if (!lua_toboolean(L, -1))  /* is it there? */
-    {
-        lua_pop(L, 1);          /* pop getfield result */
-        lua_pushvalue(L, -2);
-        lua_setfield(L, -2, "pb");
-        lua_setglobal(L, "pb");
-    }
-    else lua_pop(L, 3);
 #endif
     return 1;
 } 

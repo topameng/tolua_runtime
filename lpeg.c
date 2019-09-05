@@ -2395,13 +2395,9 @@ int luaopen_lpeg (lua_State *L) {
   lua_pushnumber(L, MAXBACK);
   lua_setfield(L, LUA_REGISTRYINDEX, MAXSTACKIDX);
   luaL_register(L, NULL, metapattreg);
-  luaL_register(L, "lpeg", pattreg);
-#if (LUA_VERSION_NUM > 501)
-  lua_setglobal(L, "lpeg");
-#endif
-  lua_pushliteral(L, "__index");
-  lua_pushvalue(L, -2);
-  lua_settable(L, -4);
+  luaL_register(L, "lpeg", pattreg);  
+  lua_pushvalue(L, -1);
+  lua_setfield(L, -3, "__index");
   return 1;
 }
 

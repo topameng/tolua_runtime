@@ -48,6 +48,11 @@ static int gettag = 0;
 static int settag = 0;
 static int vptr = 1;
 
+#if LUA_VERSION_NUM == 501
+#define lua_pushglobaltable(L)  \
+    ((void)lua_pushvalue(L, LUA_GLOBALSINDEX))
+#endif
+
 /*---------------------------tolua extend functions--------------------------------*/
 LUALIB_API void* tolua_tag()
 {
@@ -284,7 +289,7 @@ static int _lua_getfield(lua_State *L)
         
 LUA_API int tolua_getfield(lua_State *L, int idx, const char *field)
 {
-    idx = lua_absindex(L, idx);    
+    idx = abs_index(L, idx);    
     lua_pushcfunction(L, _lua_getfield);
     lua_pushvalue(L, idx);
     lua_pushstring(L, field);
@@ -301,7 +306,7 @@ static int _lua_setfield(lua_State *L)
 LUA_API int tolua_setfield(lua_State *L, int idx, const char *key)        
 {
     int top = lua_gettop(L);
-    idx = lua_absindex(L, idx);
+    idx = abs_index(L, idx);
     lua_pushcfunction(L, _lua_setfield);
     lua_pushvalue(L, idx);
     lua_pushstring(L, key);
@@ -319,7 +324,7 @@ static int _lua_gettable(lua_State *L)
 LUA_API int tolua_gettable(lua_State *L, int idx)
 {
     int top = lua_gettop(L);
-    idx = lua_absindex(L, idx);
+    idx = abs_index(L, idx);
     lua_pushcfunction(L, _lua_gettable);
     lua_pushvalue(L, idx);
     lua_pushvalue(L, top);
@@ -336,7 +341,7 @@ static int _lua_settable(lua_State *L)
 LUA_API int tolua_settable(lua_State *L, int idx)
 {
     int top = lua_gettop(L);
-    idx = lua_absindex(L, idx);
+    idx = abs_index(L, idx);
     lua_pushcfunction(L, _lua_settable);
     lua_pushvalue(L, idx);
     lua_pushvalue(L, top - 1);
@@ -1467,7 +1472,7 @@ LUALIB_API void tolua_variable(lua_State *L, const char *name, lua_CFunction get
 
 LUALIB_API int toluaL_ref(lua_State *L)
 {
-	int stackPos = lua_absindex(L, -1);	
+	int stackPos = abs_index(L, -1);	
 	lua_getref(L, LUA_RIDX_FIXEDMAP);
 	lua_pushvalue(L, stackPos);
 	lua_rawget(L, -2);
@@ -1510,7 +1515,7 @@ LUA_API lua_State* tolua_getmainstate(lua_State *L1)
 
 LUA_API int tolua_getvaluetype(lua_State *L, int stackPos)
 {
-	stackPos = lua_absindex(L, stackPos);
+	stackPos = abs_index(L, stackPos);
 	lua_getref(L, LUA_RIDX_CHECKVALUE);
 	lua_pushvalue(L, stackPos);
 	lua_call(L, 1, 1);
@@ -1665,7 +1670,7 @@ LUALIB_API int tolua_getclassref(lua_State *L, int pos)
     lua_getmetatable(L, pos);           //mt
     lua_pushstring(L, ".ref");          //mt .ref
     lua_rawget(L, -2);                  //mt ref
-    int ref = lua_tointeger(L, -1);         
+    int ref = (int)lua_tointeger(L, -1);         
     return ref;
 }
 
@@ -2199,9 +2204,9 @@ void tolua_setluabaseridx(lua_State *L)
 	}
 
     //同lua5.1.5之后版本放入mainstate和_G
+#if LUA_VERSION_NUM == 501    
 	lua_pushthread(L);
 	lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_MAINTHREAD);
-#if LUA_VERSION_NUM == 501
 	lua_pushglobaltable(L);
 	lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
 #endif
@@ -2563,12 +2568,39 @@ static const struct luaL_Reg tolua_mathf[] =
     { NULL, NULL }
 };
 
+LUALIB_API int luaopen_mathf(lua_State *L) 
+{
+#if LUA_VERSION_NUM < 502
+    luaL_register(L, "Mathf", tolua_mathf);       
+#else
+    luaL_newlib(L, tolua_mathf);
+#endif  
+  return 1;
+}
+
+LUALIB_API int luaopen_tolua(lua_State *L) 
+{
+#if LUA_VERSION_NUM < 502
+    luaL_register(L, "tolua", tolua_funcs);
+#else
+    luaL_newlib(L, tolua_funcs);
+#endif  
+  return 1;
+}
+
+static const luaL_Reg loadedlibs[] = 
+{
+    {"Mathf", luaopen_mathf},
+    {"tolua", luaopen_tolua},    
+    { NULL, NULL }
+};
+
 LUALIB_API void tolua_openlibs(lua_State *L)
 {   
     initmodulebuffer();
     luaL_openlibs(L);   
-    int top = lua_gettop(L);    
-
+    int top = lua_gettop(L);        
+    
     tolua_setluabaseridx(L);    
     tolua_opentraceback(L);
     tolua_openpreload(L);
@@ -2578,16 +2610,18 @@ LUALIB_API void tolua_openlibs(lua_State *L)
     tolua_openuint64(L);
     tolua_openvptr(L);    
     //tolua_openrequire(L);
-
-#if LUA_VERSION_NUM == 501
-    luaL_register(L, "Mathf", tolua_mathf);     
-    luaL_register(L, "tolua", tolua_funcs);    
-#else 
-    luaL_newlib(L, tolua_mathf);
-	lua_setglobal(L, "Mathf");
-    luaL_newlib(L, tolua_funcs);
-	lua_setglobal(L, "tolua");
-#endif
+     
+    for (const luaL_Reg *lib = loadedlibs; lib->func; lib++) 
+    {
+#if LUA_VERSION_NUM < 502
+        lua_pushcfunction(L, lib->func);
+        lua_pushstring(L, lib->name);
+        lua_call(L, 1, 0);
+#else
+        luaL_requiref(L, lib->name, lib->func, 1);
+        lua_pop(L, 1);
+#endif        
+    }
 
     lua_getglobal(L, "tolua");
 
@@ -2600,7 +2634,11 @@ LUALIB_API void tolua_openlibs(lua_State *L)
     lua_rawset(L, -3);
 
     lua_pushstring(L, "version");
-    lua_pushstring(L, "1.0.7");
+    lua_pushstring(L, "1.0.8");
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "version");
+    lua_pushstring(L, "1.0.8");
     lua_rawset(L, -3);
 
     lua_settop(L,top);
@@ -2755,79 +2793,62 @@ LUALIB_API int tolua_where (lua_State *L, int level)
     return -1;
 }
 
-#if LUA_VERSION_NUM == 501
-LUALIB_API void lua_pushglobaltable(lua_State *L)
+LUALIB_API int luaL_getversion() 
 {
-	lua_pushvalue(L, LUA_GLOBALSINDEX);
+    return LUA_VERSION_NUM;
 }
 
-#undef lua_upvalueindex
-LUALIB_API int lua_upvalueindex(int idx) {
-	return LUA_GLOBALSINDEX - idx;
-}
-
-#undef lua_getglobal
-LUA_API int lua_getglobal (lua_State *L, const char *name) {
-    lua_getfield(L, LUA_GLOBALSINDEX, name);
-    return 1;
-}
-
-#undef lua_setglobal
-LUA_API void lua_setglobal (lua_State *L, const char *name) {
-    lua_setfield(L, LUA_GLOBALSINDEX, name);
-}
-
-LUA_API int lua_absindex (lua_State *L, int idx) {
-    return abs_index(L, idx);
-}
-
-#elif LUA_VERSION_NUM == 503
+#if LUA_VERSION_NUM == 503
 
 #if !defined(LUA_COMPAT_MODULE)
-// LUALIB_API void luaL_register(lua_State*L, const char*libname, const luaL_Reg* l){
-//     luaL_newlib(L, l);
-// 	lua_setglobal(L, libname);
+// LUALIB_API void luaL_register(lua_State*L, const char*libname, const luaL_Reg* l)
+//{
+//      luaL_newlib(L, l);
+// 	    lua_setglobal(L, libname);
 // }
 
-LUALIB_API const char *luaL_findtable (lua_State *L, int idx,
-                                   const char *fname, int szhint) {
-  const char *e;
-  if (idx) lua_pushvalue(L, idx);
-  do {
-    e = strchr(fname, '.');
-    if (e == NULL) e = fname + strlen(fname);
-    lua_pushlstring(L, fname, e - fname);
-    if (lua_rawget(L, -2) == LUA_TNIL) {  /* no such field? */
-      lua_pop(L, 1);  /* remove this nil */
-      lua_createtable(L, 0, (*e == '.' ? 1 : szhint)); /* new table for field */
-      lua_pushlstring(L, fname, e - fname);
-      lua_pushvalue(L, -2);
-      lua_settable(L, -4);  /* set new table into field */
-    }
-    else if (!lua_istable(L, -1)) {  /* field has a non-table value? */
-      lua_pop(L, 2);  /* remove table and value */
-      return fname;  /* return problematic part of the name */
-    }
-    lua_remove(L, -2);  /* remove previous table */
-    fname = e + 1;
-  } while (*e == '.');
-  return NULL;
+LUALIB_API const char *luaL_findtable (lua_State *L, int idx, const char *fname, int szhint) 
+{
+    const char *e;
+    if (idx) lua_pushvalue(L, idx);
+
+    do 
+    {
+        e = strchr(fname, '.');
+        if (e == NULL) e = fname + strlen(fname);
+        lua_pushlstring(L, fname, e - fname);
+
+        if (lua_rawget(L, -2) == LUA_TNIL) 
+        {  /* no such field? */
+            lua_pop(L, 1);  /* remove this nil */
+            lua_createtable(L, 0, (*e == '.' ? 1 : szhint)); /* new table for field */
+            lua_pushlstring(L, fname, e - fname);
+            lua_pushvalue(L, -2);
+            lua_settable(L, -4);  /* set new table into field */
+        }
+        else if (!lua_istable(L, -1)) 
+        {  /* field has a non-table value? */
+            lua_pop(L, 2);  /* remove table and value */
+            return fname;  /* return problematic part of the name */
+        }
+
+        lua_remove(L, -2);  /* remove previous table */
+        fname = e + 1;
+    } while (*e == '.');
+
+    return NULL;
 }
 #endif
 
-LUALIB_API int luaL_typerror (lua_State *L, int narg, const char *tname) {
-  const char *msg = lua_pushfstring(L, "%s expected, got %s",
-                                    tname, luaL_typename(L, narg));
-  return luaL_argerror(L, narg, msg);
+/*just for luac5.3 in native c, don't export it*/
+int luaL_typerror (lua_State *L, int narg, const char *tname) 
+{
+    const char *msg = lua_pushfstring(L, "%s expected, got %s", tname, luaL_typename(L, narg));
+    return luaL_argerror(L, narg, msg);
 }
 
 //For C#
 /*-----------------------------------------------------------*/
-#undef lua_pushglobaltable
-LUALIB_API int lua_pushglobaltable(lua_State *L) {
-	return lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
-}
-
 // // not compatible with lua 5.1
 // #undef lua_setfenv
 // LUA_API int lua_setfenv (lua_State *L, int idx) {
@@ -2842,97 +2863,70 @@ LUALIB_API int lua_pushglobaltable(lua_State *L) {
 // }
 
 #undef lua_insert
-LUA_API void lua_insert (lua_State *L, int idx) {
+LUA_API void lua_insert (lua_State *L, int idx) 
+{
     lua_rotate(L, idx, 1);
 }
 
 #undef lua_remove
-LUA_API void lua_remove (lua_State *L, int idx) {
+LUA_API void lua_remove (lua_State *L, int idx) 
+{
 	lua_rotate(L, idx, -1);
 	lua_pop(L, 1);
 }
 
 #undef lua_replace
-LUA_API void lua_replace (lua_State *L, int idx) {
+LUA_API void lua_replace (lua_State *L, int idx) 
+{
 	lua_copy(L, -1, idx);
 	lua_pop(L, 1);
 }
 
 #define lua51_equal(L,idx1,idx2)  lua_compare(L,(idx1),(idx2),LUA_OPEQ)
 
-LUA_API int lua_equal (lua_State *L, int index1, int index2) {
-  return lua51_equal(L, index1, index2);
+LUA_API int lua_equal (lua_State *L, int index1, int index2) 
+{
+    return lua51_equal(L, index1, index2);
 }
 
 #define lua51_lessthan(L,idx1,idx2)  lua_compare(L,(idx1),(idx2),LUA_OPLT)
 
-LUA_API int lua_lessthan (lua_State *L, int index1, int index2) {
-  return lua51_lessthan(L, index1, index2);
+LUA_API int lua_lessthan (lua_State *L, int index1, int index2) 
+{
+    return lua51_lessthan(L, index1, index2);
 }
 
 #undef lua_tonumber
-LUA_API lua_Number lua_tonumber (lua_State *L, int idx) {
-	return lua_tonumberx(L, idx, NULL);
+LUA_API lua_Number lua_tonumber (lua_State *L, int idx) 
+{
+    return lua_tonumberx(L, idx, NULL);
 }
 
 #undef lua_call
-LUALIB_API void lua_call(lua_State *L, int nargs, int nresults) {
+LUALIB_API void lua_call(lua_State *L, int nargs, int nresults) 
+{
 	lua_callk(L, nargs, nresults, 0, NULL);
 }
 
 #undef lua_pcall
-LUA_API int lua_pcall (lua_State *L, int nargs, int nresults, int errfunc) {
+LUA_API int lua_pcall (lua_State *L, int nargs, int nresults, int errfunc) 
+{
 	return lua_pcallk(L, nargs, nresults, errfunc, 0, NULL);
 }
 
 #undef lua_cpcall
-LUA_API int lua_cpcall (lua_State *L, lua_CFunction func, void *ud) {
+LUA_API int lua_cpcall (lua_State *L, lua_CFunction func, void *ud) 
+{
     lua_pushcfunction(L, func);
     lua_pushlightuserdata(L, ud);
     return lua_pcall(L,1,0,0);
 }
 
-#undef lua_yield
-LUALIB_API void lua_yield(lua_State *L, int idx) {
-	lua_yieldk(L, idx, 0, NULL);
+#undef lua_tointeger
+LUA_API lua_Integer lua_tointeger (lua_State *L, int idx) 
+{
+    return lua_tointegerx(L, idx,NULL);    
 }
 
-#undef lua_upvalueindex
-LUALIB_API int lua_upvalueindex(int idx) {
-	return LUA_REGISTRYINDEX - idx;
-}
-
-#undef luaL_loadfile
-LUALIB_API int luaL_loadfile(lua_State *L, const char *filename){
-    return luaL_loadfilex(L, filename, NULL);
-}
 #endif
-
-#undef lua_pushcfunction
-LUALIB_API void lua_pushcfunction(lua_State *L, lua_CFunction f) {
-	lua_pushcclosure(L, f, 0);
-}
-
-#undef lua_register
-LUALIB_API void lua_register(lua_State *L, const char *name, lua_CFunction f) {
-	lua_pushcfunction(L, f);
-	lua_setglobal(L, name);
-}
-
-LUALIB_API void lua_rawget_global(lua_State *L, const char *name)
-{
-    lua_pushglobaltable(L);
-    lua_pushstring(L, name);
-    lua_rawget(L, -2);
-}
-
-LUALIB_API const char * lua_findtable_in_global(lua_State *L, const char *name)
-{
-    lua_pushglobaltable(L);
-    return luaL_findtable(L, 0, name, 1);
-}
-
-LUALIB_API int lua_registryindex() {
-	return LUA_REGISTRYINDEX;
-}
 /*-----------------------------------------------------------*/

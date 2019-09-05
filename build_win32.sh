@@ -39,7 +39,7 @@ mingw32-make clean
 
 case $luapath in 
     $luacdir)
-        mingw32-make mingw BUILDMODE=static CC="gcc -m32 -O2"
+        mingw32-make mingw BUILDMODE=static CC="gcc -m32 -std=gnu99"
     ;;
     $luajitdir)
         mingw32-make BUILDMODE=static CC="gcc -m32 -O2"
@@ -56,7 +56,11 @@ gcc -m32 -O2 -std=gnu99 -shared \
 	uint64.c \
 	tolua.c \
 	pb.c \
-	lpeg.c \
+	lpeg/lpcap.c \
+	lpeg/lpcode.c \
+	lpeg/lpprint.c \
+	lpeg/lptree.c \
+	lpeg/lpvm.c	\
 	struct.c \
 	cjson/strbuf.c \
 	cjson/lua_cjson.c \
@@ -80,5 +84,8 @@ gcc -m32 -O2 -std=gnu99 -shared \
  	-I$luapath/src \
 	-Icjson \
 	-Iluasocket \
+	-Ilpeg \
 	-lws2_32 \
  	-Wl,--whole-archive window/x86/$lualibname.a -Wl,--no-whole-archive -static-libgcc -static-libstdc++
+
+echo "build tolua.dll success" 	
