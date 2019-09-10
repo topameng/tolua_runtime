@@ -7,7 +7,6 @@ luapath=""
 lualibname=""
 outpath="Plugins"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-mkdir -p $DIR/ubuntu/x86
 
 while :
 do
@@ -47,7 +46,7 @@ case $luapath in
     ;;
 esac
 
-cp src/$lualibname.a ../ubuntu/x86/$lualibname.a
+cp src/$lualibname.a ../$outpath/x86/$lualibname.a
 make clean
 
 echo -e "\n[MAINTAINCE] build $lualibname.a done\n"
@@ -87,7 +86,7 @@ gcc -m32 -O2 -std=gnu99 -shared \
  -I./ \
  -I$luapath/src \
  -Iluasocket \
- -Wl,--whole-archive ubuntu/x86/$lualibname.a -Wl,--no-whole-archive -static-libgcc -static-libstdc++
+ -Wl,--whole-archive $outpath/x86/$lualibname.a -Wl,--no-whole-archive -static-libgcc -static-libstdc++
 
 if [ "$?" = "0" ]; then
 	echo -e "\n[MAINTAINCE] build libtolua.so success"
