@@ -1,4 +1,4 @@
-﻿/*
+/*
 The MIT License (MIT)
 
 Copyright (c) 2015-2020 topameng(topameng@qq.com)
@@ -130,7 +130,7 @@ static uint64_t _ulong(lua_State *L, int pos)
     return n;
 }
 
-static uint64_t tolua_touint64(lua_State *L, int pos)
+LUALIB_API uint64_t tolua_touint64(lua_State *L, int pos)
 {
     uint64_t n = 0;
     int type = lua_type(L, pos);
