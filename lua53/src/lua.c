@@ -574,6 +574,13 @@ static int pmain (lua_State *L) {
     if (handle_luainit(L) != LUA_OK)  /* run LUA_INIT */
       return 0;  /* error running LUA_INIT */
   }
+
+  const char* str = "print(xxxxxxxxxxxxxxxxxxx)";
+  if (luaL_loadbuffer(L, str, strlen(str), "main.c") != 0)
+  {
+      
+  }  
+
   if (!runargs(L, argv, script))  /* execute arguments -e and -l */
     return 0;  /* something failed */
   if (script < argc &&  /* execute main script (if there is one) */
@@ -599,7 +606,7 @@ int main (int argc, char **argv) {
   if (L == NULL) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
-  }
+  }  
   lua_pushcfunction(L, &pmain);  /* to call 'pmain' in protected mode */
   lua_pushinteger(L, argc);  /* 1st argument */
   lua_pushlightuserdata(L, argv); /* 2nd argument */

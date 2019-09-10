@@ -597,22 +597,24 @@ static void findloader (lua_State *L, const char *name) {
 static int ll_require (lua_State *L) {
   const char *name = luaL_checkstring(L, 1);
   lua_settop(L, 1);  /* LOADED table will be at index 2 */
+  const char* key = luaL_gsub(L, name, "/", ".");
+  lua_replace(L, 1);
   lua_getfield(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
-  lua_getfield(L, 2, name);  /* LOADED[name] */
+  lua_getfield(L, 2, key);  /* LOADED[name] */
   if (lua_toboolean(L, -1))  /* is it there? */
     return 1;  /* package is already loaded */
   /* else must load package */
   lua_pop(L, 1);  /* remove 'getfield' result */
-  findloader(L, name);
-  lua_pushstring(L, name);  /* pass name as argument to module loader */
+  findloader(L, key);
+  lua_pushstring(L, key);  /* pass name as argument to module loader */
   lua_insert(L, -2);  /* name is 1st argument (before search data) */
   lua_call(L, 2, 1);  /* run loader to load module */
   if (!lua_isnil(L, -1))  /* non-nil return? */
-    lua_setfield(L, 2, name);  /* LOADED[name] = returned value */
-  if (lua_getfield(L, 2, name) == LUA_TNIL) {   /* module set no value? */
+    lua_setfield(L, 2, key);  /* LOADED[name] = returned value */
+  if (lua_getfield(L, 2, key) == LUA_TNIL) {   /* module set no value? */
     lua_pushboolean(L, 1);  /* use true as result */
     lua_pushvalue(L, -1);  /* extra copy to be returned */
-    lua_setfield(L, 2, name);  /* LOADED[name] = true */
+    lua_setfield(L, 2, key);  /* LOADED[name] = true */
   }
   return 1;
 }

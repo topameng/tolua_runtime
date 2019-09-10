@@ -59,7 +59,11 @@ gcc -m32 -O2 -std=gnu99 -shared \
  int64.c \
  uint64.c \
  pb.c \
- lpeg.c \
+ lpeg/lpcap.c \
+ lpeg/lpcode.c \
+ lpeg/lpprint.c \
+ lpeg/lptree.c \
+ lpeg/lpvm.c \
  struct.c \
  cjson/strbuf.c \
  cjson/lua_cjson.c \

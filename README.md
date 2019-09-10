@@ -13,8 +13,8 @@ android: build_arm.sh build_x86.sh (mingw + lua5.3) choose 2<br>
 mac: build_osx.sh (xcode + lua5.3 ) choose 2<br>
 ios: build_ios.sh (xcode + lua5.3 ) choose 2<br>
 
-NDK 版本:android-ndk-r10e 默认安装到 D:/android-ndk-r10e<br>
-https://dl.google.com/android/repository/android-ndk-r10e-windows-x86_64.zip<br>
+NDK 版本:android-ndk-r16b 默认安装到 D:/android-ndk-r16b<br>
+https://dl.google.com/android/repository/android-ndk-r16b-windows-x86_64.zip<br>
 Msys2配置说明<br>
 https://github.com/topameng/tolua_runtime/wiki<br>
 配置好的Msys2下载<br>
@@ -33,6 +33,6 @@ http://www.inf.puc-rio.br/~roberto/struct/<br>
 http://www.inf.puc-rio.br/~roberto/lpeg/lpeg.html
 
 # 关于mac上编译iOS 32位runtime库
-* 苹果系统升级到xcode10后，移除了编译32位lib的支持，如果有需求编译支持32位版本的runtime库，请用xcode9.4.1编译，目前默认原生的编译好的都是同时支持32、64位的runtime fat lib
+* 苹果系统升级到xcode10后，移除了编译32位lib的支持，如果有需求编译支持32位版本的runtime库，请用xcode9.4.1编译，目前默认原生的编译好的是同时支持32、64位的runtime
 
 # [runtime库编译文档](https://github.com/NewbieGameCoder/tolua_runtime/wiki)
