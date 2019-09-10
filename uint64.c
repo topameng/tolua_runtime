@@ -35,6 +35,8 @@ SOFTWARE.
 #include "lualib.h"
 #include "lauxlib.h"
 
+extern void tolua_pushint64(lua_State* L, int64_t n);
+
 static bool _isuint64(lua_State *L, int pos)
 {
     if (lua_getmetatable(L, pos))
@@ -193,7 +195,16 @@ static int _uint64mul(lua_State *L)
 static int _uint64unm(lua_State *L)
 {
     uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);        
-    tolua_pushuint64(L, -lhs);
+
+    if (lhs >= _I64_MAX)
+    {
+        luaL_error(L, "#1 out of range: %" PRIu64, lhs);
+    }
+    else
+    {
+        tolua_pushint64(L, -lhs);
+    }
+
     return 1;
 }
 
@@ -211,12 +222,12 @@ static int _uint64pow(lua_State *L)
     {
         ret = 1;
     }
-    else
+    /*else
     {                    
         char temp[64];
         sprintf(temp, "%" PRIu64, rhs);    
         return luaL_error(L, "pow by nagtive number: %s", temp);   
-    }
+    }*/
 
     tolua_pushuint64(L, ret);
     return 1;
@@ -355,12 +366,12 @@ int tolua_newuint64(lua_State *L)
 
             if (n1 < 0 || n1 > UINT_MAX)
             {
-                return luaL_error(L, "#1 out of range: %" PRIu64, n1);
+                return luaL_error(L, "#1 out of range: %" PRId64, n1);
             }
 
             if (n2 < 0 || n2 > UINT_MAX)
             {
-                return luaL_error(L, "#2 out of range: %" PRIu64, n2);
+                return luaL_error(L, "#2 out of range: %" PRId64, n2);
             }
 
             n = n2;
