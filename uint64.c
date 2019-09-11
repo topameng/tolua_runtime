@@ -196,7 +196,7 @@ static int _uint64unm(lua_State *L)
 {
     uint64_t lhs = *(uint64_t*)lua_touserdata(L, 1);        
 
-    if (lhs >= _I64_MAX)
+    if (lhs >= LLONG_MAX)
     {
         luaL_error(L, "#1 out of range: %" PRIu64, lhs);
     }
