@@ -404,6 +404,9 @@ static void trace_start(jit_State *J)
 {
   lua_State *L;
   TraceNo traceno;
+#ifdef LUA_USE_TRACE_LOGS
+  const BCIns *pc = J->pc;
+#endif
 
   if ((J->pt->flags & PROTO_NOJIT)) {  /* JIT disabled for this proto? */
     if (J->parent == 0 && J->exitno == 0) {
@@ -462,6 +465,9 @@ static void trace_start(jit_State *J)
     }
   );
   lj_record_setup(J);
+#ifdef LUA_USE_TRACE_LOGS
+  lj_log_trace_start_record(L, (unsigned) J->cur.traceno, pc, J->fn);
+#endif
 }
 
 /* Stop tracing. */
@@ -587,21 +593,22 @@ static int trace_abort(jit_State *J)
     J->cur.link = 0;
     J->cur.linktype = LJ_TRLINK_NONE;
     lj_vmevent_send(L, TRACE,
-      TValue *frame;
-      const BCIns *pc;
+      cTValue *frame;
+      int size;
+      BCIns pc;
       GCfunc *fn;
       setstrV(L, L->top++, lj_str_newlit(L, "abort"));
       setintV(L->top++, traceno);
-      /* Find original Lua function call to generate a better error message. */
-      frame = J->L->base-1;
-      pc = J->pc;
-      while (!isluafunc(frame_func(frame))) {
-	pc = (frame_iscont(frame) ? frame_contpc(frame) : frame_pc(frame)) - 1;
-	frame = frame_prev(frame);
-      }
+      /* Find original function call to generate a better error message. */
+      frame = lj_debug_frame(L, 0, &size);
+      lua_assert(frame != NULL);
       fn = frame_func(frame);
+      if (frame == L->base-1 && isluafunc(fn))
+	pc = proto_bcpos(funcproto(fn), J->pc);
+      else
+	pc = lj_debug_framepc(L, fn, frame);
       setfuncV(L, L->top++, fn);
-      setintV(L->top++, proto_bcpos(funcproto(fn), pc));
+      setintV(L->top++, pc);
       copyTV(L, L->top++, restorestack(L, errobj));
       copyTV(L, L->top++, &J->errinfo);
     );
@@ -890,6 +897,9 @@ int LJ_FASTCALL lj_trace_exit(jit_State *J, void *exptr)
       }
     }
   }
+#ifdef LUA_USE_TRACE_LOGS
+  lj_log_trace_normal_exit(L, (int) T->traceno, pc);
+#endif
   /* Return MULTRES or 0. */
   ERRNO_RESTORE
   switch (bc_op(*pc)) {

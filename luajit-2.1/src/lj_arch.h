@@ -29,6 +29,8 @@
 #define LUAJIT_ARCH_mips32	6
 #define LUAJIT_ARCH_MIPS64	7
 #define LUAJIT_ARCH_mips64	7
+#define LUAJIT_ARCH_S390X	8
+#define LUAJIT_ARCH_s390x	8
 
 /* Target OS. */
 #define LUAJIT_OS_OTHER		0
@@ -49,6 +51,8 @@
 #define LUAJIT_TARGET	LUAJIT_ARCH_ARM
 #elif defined(__aarch64__)
 #define LUAJIT_TARGET	LUAJIT_ARCH_ARM64
+#elif defined(__s390x__) || defined(__s390x)
+#define LUAJIT_TARGET	LUAJIT_ARCH_S390X
 #elif defined(__ppc__) || defined(__ppc) || defined(__PPC__) || defined(__PPC) || defined(__powerpc__) || defined(__powerpc) || defined(__POWERPC__) || defined(__POWERPC) || defined(_M_PPC)
 #define LUAJIT_TARGET	LUAJIT_ARCH_PPC
 #elif defined(__mips64__) || defined(__mips64) || defined(__MIPS64__) || defined(__MIPS64)
@@ -135,6 +139,13 @@
 #define LJ_TARGET_GC64		1
 #endif
 
+#ifdef _UWP
+#define LJ_TARGET_UWP		1
+#if LUAJIT_TARGET == LUAJIT_ARCH_X64
+#define LJ_TARGET_GC64		1
+#endif
+#endif
+
 #define LJ_NUMMODE_SINGLE	0	/* Single-number mode only. */
 #define LJ_NUMMODE_SINGLE_DUAL	1	/* Default to single-number mode. */
 #define LJ_NUMMODE_DUAL		2	/* Dual-number mode only. */
@@ -201,7 +212,7 @@
 #define LJ_TARGET_UNIFYROT	2	/* Want only IR_BROR. */
 #define LJ_ARCH_NUMMODE		LJ_NUMMODE_DUAL
 
-#if __ARM_ARCH____ARM_ARCH_8__ || __ARM_ARCH_8A__
+#if __ARM_ARCH_8__ || __ARM_ARCH_8A__
 #define LJ_ARCH_VERSION		80
 #elif __ARM_ARCH_7__ || __ARM_ARCH_7A__ || __ARM_ARCH_7R__ || __ARM_ARCH_7S__ || __ARM_ARCH_7VE__
 #define LJ_ARCH_VERSION		70
@@ -254,6 +265,28 @@
 #else
 #define LJ_ARCH_BITS		32
 #define LJ_ARCH_NAME		"ppc"
+
+#if !defined(LJ_ARCH_HASFPU)
+#if defined(_SOFT_FLOAT) || defined(_SOFT_DOUBLE)
+#define LJ_ARCH_HASFPU		0
+#else
+#define LJ_ARCH_HASFPU		1
+#endif
+#endif
+
+#if !defined(LJ_ABI_SOFTFP)
+#if defined(_SOFT_FLOAT) || defined(_SOFT_DOUBLE)
+#define LJ_ABI_SOFTFP		1
+#else
+#define LJ_ABI_SOFTFP		0
+#endif
+#endif
+#endif
+
+#if LJ_ABI_SOFTFP
+#define LJ_ARCH_NUMMODE		LJ_NUMMODE_DUAL
+#else
+#define LJ_ARCH_NUMMODE		LJ_NUMMODE_DUAL_SINGLE
 #endif
 
 #define LJ_TARGET_PPC		1
@@ -262,7 +295,6 @@
 #define LJ_TARGET_MASKSHIFT	0
 #define LJ_TARGET_MASKROT	1
 #define LJ_TARGET_UNIFYROT	1	/* Want only IR_BROL. */
-#define LJ_ARCH_NUMMODE		LJ_NUMMODE_DUAL_SINGLE
 
 #if LJ_TARGET_CONSOLE
 #define LJ_ARCH_PPC32ON64	1
@@ -337,9 +369,6 @@
 #define LJ_ARCH_BITS		32
 #define LJ_TARGET_MIPS32	1
 #else
-#if LJ_ABI_SOFTFP || !LJ_ARCH_HASFPU
-#define LJ_ARCH_NOJIT		1	/* NYI */
-#endif
 #define LJ_ARCH_BITS		64
 #define LJ_TARGET_MIPS64	1
 #define LJ_TARGET_GC64		1
@@ -358,6 +387,21 @@
 #define LJ_ARCH_VERSION		10
 #endif
 
+#elif LUAJIT_TARGET == LUAJIT_ARCH_S390X
+
+#define LJ_ARCH_NAME		"s390x"
+#define LJ_ARCH_BITS		64
+#define LJ_ARCH_ENDIAN		LUAJIT_BE
+#define LJ_TARGET_S390X		1
+#define LJ_TARGET_EHRETREG	0xe
+#define LJ_TARGET_JUMPRANGE	32	/* +-2^32 = +-4GB (32-bit, halfword aligned) */
+#define LJ_TARGET_MASKSHIFT	1
+#define LJ_TARGET_MASKROT	1
+#define LJ_TARGET_UNALIGNED	1
+#define LJ_ARCH_NUMMODE		LJ_NUMMODE_DUAL
+#define LJ_TARGET_GC64		1
+#define LJ_ARCH_NOJIT		1	/* NYI */
+
 #else
 #error "No target architecture defined"
 #endif
@@ -373,7 +417,7 @@
 #error "Need at least GCC 3.4 or newer"
 #endif
 #elif LJ_TARGET_X64
-#if __GNUC__ < 4
+#if 0 && __GNUC__ < 4
 #error "Need at least GCC 4.0 or newer"
 #endif
 #elif LJ_TARGET_ARM
@@ -418,16 +462,10 @@
 #error "No support for ILP32 model on ARM64"
 #endif
 #elif LJ_TARGET_PPC
-#if defined(_SOFT_FLOAT) || defined(_SOFT_DOUBLE)
-#error "No support for PowerPC CPUs without double-precision FPU"
-#endif
-#if !LJ_ARCH_PPC64 && LJ_ARCH_ENDIAN == LUAJIT_LE
+#if !LJ_ARCH_PPC64 && (defined(_LITTLE_ENDIAN) && (!defined(_BYTE_ORDER) || (_BYTE_ORDER == _LITTLE_ENDIAN)))
 #error "No support for little-endian PPC32"
 #endif
-#if LJ_ARCH_PPC64
-#error "No support for PowerPC 64 bit mode (yet)"
-#endif
-#ifdef __NO_FPRS__
+#if defined(__NO_FPRS__) && !defined(_SOFT_FLOAT)
 #error "No support for PPC/e500 anymore (use LuaJIT 2.0)"
 #endif
 #elif LJ_TARGET_MIPS32
@@ -512,6 +550,7 @@
 #define LJ_ABI_SOFTFP		0
 #endif
 #define LJ_SOFTFP		(!LJ_ARCH_HASFPU)
+#define LJ_SOFTFP32		(LJ_SOFTFP && LJ_32)
 
 #if LJ_ARCH_ENDIAN == LUAJIT_BE
 #define LJ_LE			0
@@ -555,6 +594,18 @@
 
 #if defined(LUAJIT_NO_UNWIND) || defined(__symbian__) || LJ_TARGET_IOS || LJ_TARGET_PS3 || LJ_TARGET_PS4
 #define LJ_NO_UNWIND		1
+#endif
+
+#if LJ_TARGET_WINDOWS
+#if LJ_TARGET_UWP
+#define LJ_WIN_VALLOC	VirtualAllocFromApp
+#define LJ_WIN_VPROTECT	VirtualProtectFromApp
+extern void *LJ_WIN_LOADLIBA(const char *path);
+#else
+#define LJ_WIN_VALLOC	VirtualAlloc
+#define LJ_WIN_VPROTECT	VirtualProtect
+#define LJ_WIN_LOADLIBA(path)	LoadLibraryExA((path), NULL, 0)
+#endif
 #endif
 
 /* Compatibility with Lua 5.1 vs. 5.2. */
