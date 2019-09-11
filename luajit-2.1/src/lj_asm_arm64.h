@@ -56,11 +56,11 @@ static void asm_exitstub_setup(ASMState *as, ExitNo nexits)
     asm_mclimit(as);
   /* 1: str lr,[sp]; bl ->vm_exit_handler; movz w0,traceno; bl <1; bl <1; ... */
   for (i = nexits-1; (int32_t)i >= 0; i--)
-    *--mxp = A64I_LE(A64I_BL|((-3-i)&0x03ffffffu));
-  *--mxp = A64I_LE(A64I_MOVZw|A64F_U16(as->T->traceno));
+    *--mxp = A64I_LE(A64I_BL | A64F_S26(-3-i));
+  *--mxp = A64I_LE(A64I_MOVZw | A64F_U16(as->T->traceno));
   mxp--;
-  *mxp = A64I_LE(A64I_BL|(((MCode *)(void *)lj_vm_exit_handler-mxp)&0x03ffffffu));
-  *--mxp = A64I_LE(A64I_STRx|A64F_D(RID_LR)|A64F_N(RID_SP));
+  *mxp = A64I_LE(A64I_BL | A64F_S26(((MCode *)(void *)lj_vm_exit_handler-mxp)));
+  *--mxp = A64I_LE(A64I_STRx | A64F_D(RID_LR) | A64F_N(RID_SP));
   as->mctop = mxp;
 }
 
@@ -77,7 +77,7 @@ static void asm_guardcc(ASMState *as, A64CC cc)
   MCode *p = as->mcp;
   if (LJ_UNLIKELY(p == as->invmcp)) {
     as->loopinv = 1;
-    *p = A64I_B | ((target-p) & 0x03ffffffu);
+    *p = A64I_B | A64F_S26(target-p);
     emit_cond_branch(as, cc^1, p-1);
     return;
   }
@@ -91,7 +91,7 @@ static void asm_guardtnb(ASMState *as, A64Ins ai, Reg r, uint32_t bit)
   MCode *p = as->mcp;
   if (LJ_UNLIKELY(p == as->invmcp)) {
     as->loopinv = 1;
-    *p = A64I_B | ((target-p) & 0x03ffffffu);
+    *p = A64I_B | A64F_S26(target-p);
     emit_tnb(as, ai^0x01000000u, r, bit, p-1);
     return;
   }
@@ -105,7 +105,7 @@ static void asm_guardcnb(ASMState *as, A64Ins ai, Reg r)
   MCode *p = as->mcp;
   if (LJ_UNLIKELY(p == as->invmcp)) {
     as->loopinv = 1;
-    *p = A64I_B | ((target-p) & 0x03ffffffu);
+    *p = A64I_B | A64F_S26(target-p);
     emit_cnb(as, ai^0x01000000u, r, p-1);
     return;
   }
@@ -295,21 +295,17 @@ static void asm_fusexref(ASMState *as, A64Ins ai, Reg rd, IRRef ref,
       } else if (asm_isk32(as, ir->op1, &ofs)) {
 	ref = ir->op2;
       } else {
-	Reg rn = ra_alloc1(as, ir->op1, allow);
-	IRIns *irr = IR(ir->op2);
-	uint32_t m;
-	if (irr+1 == ir && !ra_used(irr) &&
-	    irr->o == IR_ADD && irref_isk(irr->op2)) {
-	  ofs = sizeof(GCstr) + IR(irr->op2)->i;
-	  if (emit_checkofs(ai, ofs)) {
-	    Reg rm = ra_alloc1(as, irr->op1, rset_exclude(allow, rn));
-	    m = A64F_M(rm) | A64F_EX(A64EX_SXTW);
-	    goto skipopm;
-	  }
+	IRRef ref1 = ir->op1;
+	IRRef ref2 = ir->op2;
+	Reg rn;
+
+	if (irref_isk(ir->op1)) {
+	  ref1 = ir->op2;
+	  ref2 = ir->op1;
 	}
-	m = asm_fuseopm(as, 0, ir->op2, rset_exclude(allow, rn));
+	rn = ra_alloc1(as, ref1, allow);
+	uint32_t m = asm_fuseopm(as, 0, ref2, rset_exclude(allow, rn));
 	ofs = sizeof(GCstr);
-      skipopm:
 	emit_lso(as, ai, rd, rd, ofs);
 	emit_dn(as, A64I_ADDx^m, rd, rn);
 	return;
@@ -343,6 +339,35 @@ static int asm_fusemadd(ASMState *as, IRIns *ir, A64Ins ai, A64Ins air)
 			 rset_exclude(rset_exclude(RSET_FPR, dest), add));
     Reg right = (left >> 8); left &= 255;
     emit_dnma(as, ai, (dest & 31), (left & 31), (right & 31), (add & 31));
+    return 1;
+  }
+  return 0;
+}
+
+/* Fuse FP neg-multiply-add/sub. */
+static int asm_fusenmadd(ASMState *as, IRIns *ir, A64Ins ai, A64Ins air)
+{
+  IRRef ref = ir->op1;
+  IRIns *irn = IR(ref);
+  if (irn->o != IR_ADD && irn->o != IR_SUB)
+    return 0;
+
+  if (!mayfuse(as, ref))
+    return 0;
+
+  IRRef lref = irn->op1, rref = irn->op2;
+  IRIns *irm;
+  if (lref != rref &&
+      ((mayfuse(as, lref) && (irm = IR(lref), irm->o == IR_MUL) &&
+       ra_noreg(irm->r)) ||
+       (mayfuse(as, rref) && (irm = IR(rref), irm->o == IR_MUL) &&
+       (rref = lref, ra_noreg(irm->r))))) {
+    Reg dest = ra_dest(as, ir, RSET_FPR);
+    Reg add = ra_hintalloc(as, rref, dest, RSET_FPR);
+    Reg left = ra_alloc2(as, irm,
+			 rset_exclude(rset_exclude(RSET_FPR, dest), add));
+    Reg right = (left >> 8); left &= 255;
+    emit_dnma(as, (irn->o == IR_ADD ? ai : air), (dest & 31), (left & 31), (right & 31), (add & 31));
     return 1;
   }
   return 0;
@@ -730,6 +755,14 @@ static void asm_href(ASMState *as, IRIns *ir, IROp merge)
   uint32_t khash;
   MCLabel l_end, l_loop, l_next;
   rset_clear(allow, tab);
+  Reg tisnum = RID_TMP;
+
+  /* Allocate register early and clear it from the allowed set since it gets
+   * used multiple times during the loop.  */
+  if (irt_isnum(kt) && !isk) {
+    tisnum = ra_allock(as, LJ_TISNUM << 15, allow);
+    rset_clear(allow, tisnum);
+  }
 
   if (!isk) {
     key = ra_alloc1(as, ir->op2, irt_isnum(kt) ? RSET_FPR : allow);
@@ -780,9 +813,7 @@ static void asm_href(ASMState *as, IRIns *ir, IROp merge)
 	emit_nm(as, A64I_CMPx, key, tmp);
       emit_lso(as, A64I_LDRx, tmp, dest, offsetof(Node, key.u64));
     } else {
-      Reg tisnum = ra_allock(as, LJ_TISNUM << 15, allow);
       Reg ftmp = ra_scratch(as, rset_exclude(RSET_FPR, key));
-      rset_clear(allow, tisnum);
       emit_nm(as, A64I_FCMPd, key, ftmp);
       emit_dn(as, A64I_FMOV_D_R, (ftmp & 31), (tmp & 31));
       emit_cond_branch(as, CC_LO, l_next);
@@ -869,14 +900,12 @@ static void asm_hrefk(ASMState *as, IRIns *ir)
   int32_t ofs = (int32_t)(kslot->op2 * sizeof(Node));
   int32_t kofs = ofs + (int32_t)offsetof(Node, key);
   int bigofs = !emit_checkofs(A64I_LDRx, ofs);
-  RegSet allow = RSET_GPR;
   Reg dest = (ra_used(ir) || bigofs) ? ra_dest(as, ir, RSET_GPR) : RID_NONE;
-  Reg node = ra_alloc1(as, ir->op1, allow);
-  Reg key = ra_scratch(as, rset_clear(allow, node));
-  Reg idx = node;
+  Reg node = ra_alloc1(as, ir->op1, RSET_GPR);
+  Reg key, idx = node;
+  RegSet allow = rset_exclude(RSET_GPR, node);
   uint64_t k;
   lua_assert(ofs % sizeof(Node) == 0);
-  rset_clear(allow, key);
   if (bigofs) {
     idx = dest;
     rset_clear(allow, dest);
@@ -892,7 +921,8 @@ static void asm_hrefk(ASMState *as, IRIns *ir)
   } else {
     k = ((uint64_t)irt_toitype(irkey->t) << 47) | (uint64_t)ir_kgc(irkey);
   }
-  emit_nm(as, A64I_CMPx, key, ra_allock(as, k, allow));
+  key = ra_scratch(as, allow);
+  emit_nm(as, A64I_CMPx, key, ra_allock(as, k, rset_exclude(allow, key)));
   emit_lso(as, A64I_LDRx, key, idx, kofs);
   if (bigofs)
     emit_opk(as, A64I_ADDx, dest, node, ofs, RSET_GPR);
@@ -1012,10 +1042,30 @@ static void asm_xload(ASMState *as, IRIns *ir)
   asm_fusexref(as, asm_fxloadins(ir), dest, ir->op1, RSET_GPR);
 }
 
+static int maybe_zero_val(ASMState *as, IRRef ref)
+{
+  IRIns *ir = IR(ref);
+
+  switch(ir->o) {
+  case IR_KNULL:
+    return 1;
+  case IR_KINT:
+    return 0 == ir->i;
+  case IR_KINT64:
+    return 0 == ir_kint64(ir)->u64;
+  }
+
+  return 0;
+}
+
 static void asm_xstore(ASMState *as, IRIns *ir)
 {
   if (ir->r != RID_SINK) {
-    Reg src = ra_alloc1(as, ir->op2, irt_isfp(ir->t) ? RSET_FPR : RSET_GPR);
+    Reg src;
+    if (irref_isk(ir->op2) && maybe_zero_val(as, ir->op2))
+      src = RID_ZERO;
+    else
+      src = ra_alloc1(as, ir->op2, irt_isfp(ir->t) ? RSET_FPR : RSET_GPR);
     asm_fusexref(as, asm_fxstoreins(ir), src, ir->op1,
 		 rset_exclude(RSET_GPR, src));
   }
@@ -1203,7 +1253,12 @@ static void asm_cnew(ASMState *as, IRIns *ir)
   /* Initialize immutable cdata object. */
   if (ir->o == IR_CNEWI) {
     int32_t ofs = sizeof(GCcdata);
-    Reg r = ra_alloc1(as, ir->op2, allow);
+    Reg r;
+    if (irref_isk(ir->op2) && maybe_zero_val(as, ir->op2))
+      r = RID_ZERO;
+    else
+      r = ra_alloc1(as, ir->op2, allow);
+
     lua_assert(sz == 4 || sz == 8);
     emit_lso(as, sz == 8 ? A64I_STRx : A64I_STRw, r, RID_RET, ofs);
   } else if (ir->op2 != REF_NIL) {  /* Create VLA/VLS/aligned cdata. */
@@ -1219,7 +1274,7 @@ static void asm_cnew(ASMState *as, IRIns *ir)
 
   /* Initialize gct and ctypeid. lj_mem_newgco() already sets marked. */
   {
-    Reg r = (id < 65536) ? RID_X1 : ra_allock(as, id, allow);
+    Reg r = id == 0 ? RID_ZERO : (id < 65536) ? RID_X1 : ra_allock(as, id, allow);
     emit_lso(as, A64I_STRB, RID_TMP, RID_RET, offsetof(GCcdata, gct));
     emit_lso(as, A64I_STRH, r, RID_RET, offsetof(GCcdata, ctypeid));
     emit_d(as, A64I_MOVZw | A64F_U16(~LJ_TCDATA), RID_TMP);
@@ -1461,7 +1516,8 @@ static void asm_mod(ASMState *as, IRIns *ir)
 static void asm_neg(ASMState *as, IRIns *ir)
 {
   if (irt_isnum(ir->t)) {
-    asm_fpunary(as, ir, A64I_FNEGd);
+    if (!asm_fusenmadd(as, ir, A64I_FNMADDd, A64I_FNMSUBd))
+      asm_fpunary(as, ir, A64I_FNEGd);
     return;
   }
   asm_intneg(as, ir);
@@ -1851,7 +1907,7 @@ static void asm_loop_fixup(ASMState *as)
     p[-2] |= ((uint32_t)delta & mask) << 5;
   } else {
     ptrdiff_t delta = target - (p - 1);
-    p[-1] = A64I_B | ((uint32_t)(delta) & 0x03ffffffu);
+    p[-1] = A64I_B | A64F_S26(delta);
   }
 }
 
@@ -1885,6 +1941,17 @@ static RegSet asm_head_side_base(ASMState *as, IRIns *irp, RegSet allow)
   IRIns *ir;
   asm_head_lreg(as);
   ir = IR(REF_BASE);
+
+  /* IRRefs that get into the side trace from the parent trace may restore
+   * REF_BASE under severe register pressure and thus reach here holding on to
+   * the register.  Restore such references so that REF_BASE gets RID_BASE back
+   * when it tries to allocate below.  */
+  if (!ra_hasreg(ir->r)) {
+    Reg r = ra_gethint(ir->r);
+    if (!rset_test(as->freeset, r))
+      ra_restore(as, regcost_ref(as->cost[r]));
+  }
+
   if (ra_hasreg(ir->r) && (rset_test(as->modset, ir->r) || irt_ismarked(ir->t)))
     ra_spill(as, ir);
   if (ra_hasspill(irp->s)) {
@@ -1920,7 +1987,7 @@ static void asm_tail_fixup(ASMState *as, TraceNo lnk)
   }
   /* Patch exit branch. */
   target = lnk ? traceref(as->J, lnk)->mcode : (MCode *)lj_vm_exit_interp;
-  p[-1] = A64I_B | (((target-p)+1)&0x03ffffffu);
+  p[-1] = A64I_B | A64F_S26((target-p)+1);
 }
 
 /* Prepare tail of code. */
@@ -1983,40 +2050,50 @@ void lj_asm_patchexit(jit_State *J, GCtrace *T, ExitNo exitno, MCode *target)
 {
   MCode *p = T->mcode;
   MCode *pe = (MCode *)((char *)p + T->szmcode);
-  MCode *cstart = NULL, *cend = p;
+  MCode *cstart = NULL;
   MCode *mcarea = lj_mcode_patch(J, p, 0);
   MCode *px = exitstub_trace_addr(T, exitno);
+  /* Note: this assumes a trace exit is only ever patched once. */
   for (; p < pe; p++) {
     /* Look for exitstub branch, replace with branch to target. */
+    ptrdiff_t delta = target - p;
     MCode ins = A64I_LE(*p);
     if ((ins & 0xff000000u) == 0x54000000u &&
 	((ins ^ ((px-p)<<5)) & 0x00ffffe0u) == 0) {
-      /* Patch bcc exitstub. */
-      *p = A64I_LE((ins & 0xff00001fu) | (((target-p)<<5) & 0x00ffffe0u));
-      cend = p+1;
-      if (!cstart) cstart = p;
+      /* Patch bcc, if within range. */
+      if (A64F_S_OK(delta, 19)) {
+	*p = A64I_LE((ins & 0xff00001fu) | A64F_S19(delta));
+	if (!cstart) cstart = p;
+      }
     } else if ((ins & 0xfc000000u) == 0x14000000u &&
 	       ((ins ^ (px-p)) & 0x03ffffffu) == 0) {
-      /* Patch b exitstub. */
-      *p = A64I_LE((ins & 0xfc000000u) | ((target-p) & 0x03ffffffu));
-      cend = p+1;
+      /* Patch b. */
+      lua_assert(A64F_S_OK(delta, 26));
+      *p = A64I_LE((ins & 0xfc000000u) | A64F_S26(delta));
       if (!cstart) cstart = p;
     } else if ((ins & 0x7e000000u) == 0x34000000u &&
 	       ((ins ^ ((px-p)<<5)) & 0x00ffffe0u) == 0) {
-      /* Patch cbz/cbnz exitstub. */
-      *p = A64I_LE((ins & 0xff00001f) | (((target-p)<<5) & 0x00ffffe0u));
-      cend = p+1;
-      if (!cstart) cstart = p;
+      /* Patch cbz/cbnz, if within range. */
+      if (A64F_S_OK(delta, 19)) {
+	*p = A64I_LE((ins & 0xff00001fu) | A64F_S19(delta));
+	if (!cstart) cstart = p;
+      }
     } else if ((ins & 0x7e000000u) == 0x36000000u &&
 	       ((ins ^ ((px-p)<<5)) & 0x0007ffe0u) == 0) {
-      /* Patch tbz/tbnz exitstub. */
-      *p = A64I_LE((ins & 0xfff8001fu) | (((target-p)<<5) & 0x0007ffe0u));
-      cend = p+1;
-      if (!cstart) cstart = p;
+      /* Patch tbz/tbnz, if within range. */
+      if (A64F_S_OK(delta, 14)) {
+	*p = A64I_LE((ins & 0xfff8001fu) | A64F_S14(delta));
+	if (!cstart) cstart = p;
+      }
     }
   }
-  lua_assert(cstart != NULL);
-  lj_mcode_sync(cstart, cend);
+  {  /* Always patch long-range branch in exit stub itself. */
+    ptrdiff_t delta = target - px;
+    lua_assert(A64F_S_OK(delta, 26));
+    *px = A64I_B | A64F_S26(delta);
+    if (!cstart) cstart = px;
+  }
+  lj_mcode_sync(cstart, px+1);
   lj_mcode_patch(J, mcarea, 1);
 }
 
