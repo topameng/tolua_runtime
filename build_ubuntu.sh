@@ -24,6 +24,7 @@ gcc -m64 -O2 -std=gnu99 -shared \
  cjson/strbuf.c \
  cjson/lua_cjson.c \
  cjson/fpconv.c \
+ hot/lua_hot.c \
  luasocket/auxiliar.c \
  luasocket/buffer.c \
  luasocket/except.c \

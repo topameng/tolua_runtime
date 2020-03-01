@@ -43,12 +43,6 @@ SOFTWARE.
 #include <sys/time.h>
 #endif
 
-#if !defined __APPLE__
-#else
-#include "lobject.h"
-#include "lstate.h"
-#endif
-
 int toluaflags = FLAG_INDEX_ERROR;
 static int tag = 0;  
 static int gettag = 0;
@@ -2036,33 +2030,6 @@ static int tolua_gettime(lua_State *L)
 	return 1;
 }
 
-#if !defined __APPLE__
-static int tolua_swap(lua_State *L)
-{
-    return 0;
-}
-#else
-static int tolua_swap(lua_State *L)
-{
-    StkId o1, o2;
-    Proto *p1, *p2;
-
-    luaL_checktype(L, 1, LUA_TFUNCTION);
-    luaL_checktype(L, 2, LUA_TFUNCTION);
-
-    o1 = L->base;
-    o2 = L->base + 1;
-
-    p1 = o1->value.gc->cl.l.p;
-    p2 = o2->value.gc->cl.l.p;
-    o1->value.gc->cl.l.p = p2;
-    o2->value.gc->cl.l.p = p1;
-    
-    lua_settop(L, 0);
-    return 0;
-}
-#endif
-
 static int tolua_bnd_setpeer(lua_State *L) 
 {
     // stack: userdata, table
@@ -2217,7 +2184,6 @@ static const struct luaL_Reg tolua_funcs[] =
     { "int64", tolua_newint64},        
     { "uint64", tolua_newuint64},
     { "traceback", traceback},
-    { "swap", tolua_swap},
 	{ NULL, NULL }
 };
 
