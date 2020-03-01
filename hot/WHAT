@@ -1,0 +1,3 @@
+Usefull to reload lua functions. Help developer modify lua logic without restart the game.
+
+WARNING: Do **NOT** use it in a release app because i'm not really sure if it will cause gc problems or not.
