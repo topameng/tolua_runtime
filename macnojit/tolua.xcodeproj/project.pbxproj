@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7CED1C96240B64D000B61E71 /* lua_hot.c in Sources */ = {isa = PBXBuildFile; fileRef = 7CED1C95240B64D000B61E71 /* lua_hot.c */; };
 		840092821CCF406200F89A56 /* auxiliar.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092611CCF406200F89A56 /* auxiliar.c */; };
 		840092831CCF406200F89A56 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092631CCF406200F89A56 /* buffer.c */; };
 		840092841CCF406200F89A56 /* compat.c in Sources */ = {isa = PBXBuildFile; fileRef = 840092651CCF406200F89A56 /* compat.c */; };
@@ -69,6 +70,7 @@
 		0F4B04D71800959F002EA938 /* tolua-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "tolua-Info.plist"; sourceTree = "<group>"; };
 		0F4B04D91800959F002EA938 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		0F4B04DB1800959F002EA938 /* tolua-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "tolua-Prefix.pch"; sourceTree = "<group>"; };
+		7CED1C95240B64D000B61E71 /* lua_hot.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lua_hot.c; path = ../../../hot/lua_hot.c; sourceTree = "<group>"; };
 		840092611CCF406200F89A56 /* auxiliar.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = auxiliar.c; sourceTree = "<group>"; };
 		840092621CCF406200F89A56 /* auxiliar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = auxiliar.h; sourceTree = "<group>"; };
 		840092631CCF406200F89A56 /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = buffer.c; sourceTree = "<group>"; };
@@ -200,6 +202,7 @@
 			isa = PBXGroup;
 			children = (
 				842A59A21C85B76100EA2815 /* cjson */,
+				7CED1C94240B64A400B61E71 /* hot */,
 				84EF23541C4CCD3F0093A49A /* lua */,
 				84F8B8B81C4567C100AE9B8F /* luasocket */,
 				84F8B8B61C45679C00AE9B8F /* lpeg.c */,
@@ -222,6 +225,15 @@
 				0F4B04DB1800959F002EA938 /* tolua-Prefix.pch */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		7CED1C94240B64A400B61E71 /* hot */ = {
+			isa = PBXGroup;
+			children = (
+				7CED1C95240B64D000B61E71 /* lua_hot.c */,
+			);
+			name = hot;
+			path = tolua;
 			sourceTree = "<group>";
 		};
 		842A59A21C85B76100EA2815 /* cjson */ = {
@@ -371,6 +383,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 0F4B04C71800959F002EA938;
@@ -444,6 +457,7 @@
 				84EF239A1C4CCD3F0093A49A /* lmem.c in Sources */,
 				84EF23901C4CCD3F0093A49A /* ldblib.c in Sources */,
 				84EF23941C4CCD3F0093A49A /* lfunc.c in Sources */,
+				7CED1C96240B64D000B61E71 /* lua_hot.c in Sources */,
 				840092841CCF406200F89A56 /* compat.c in Sources */,
 				84EF23971C4CCD3F0093A49A /* liolib.c in Sources */,
 				84EF238F1C4CCD3F0093A49A /* lcode.c in Sources */,
@@ -557,7 +571,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-all_load";
 				PRODUCT_NAME = tolua;
-				VALID_ARCHS = "x86_64 i386";
+				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = bundle;
 			};
 			name = Debug;
@@ -581,7 +595,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-all_load";
 				PRODUCT_NAME = tolua;
-				VALID_ARCHS = "x86_64 i386";
+				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = bundle;
 			};
 			name = Release;
