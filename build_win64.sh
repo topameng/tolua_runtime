@@ -40,4 +40,5 @@ gcc -m64 -O2 -std=gnu99 -shared \
  -Iluajit-2.1/src \
  -Iluasocket \
  -lws2_32 \
+ -DLUAJIT_ENABLE_GC64 \
  -Wl,--whole-archive window/x86_64/libluajit.a -Wl,--no-whole-archive -static-libgcc -static-libstdc++

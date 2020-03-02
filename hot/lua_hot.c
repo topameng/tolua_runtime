@@ -13,17 +13,18 @@
 static int hot_swaplfunc(lua_State *L)
 {
     TValue *o1, *o2;
-    MRef ptr;
+    MRef ptr1, ptr2;
 
     luaL_checktype(L, 1, LUA_TFUNCTION);
     luaL_checktype(L, 2, LUA_TFUNCTION);
     
     o1 = L->base;
     o2 = L->base + 1;
-
-    ptr = (&gcval(o2)->fn)->l.pc;
-    (&gcval(o2)->fn)->l.pc = (&gcval(o1)->fn)->l.pc;
-    (&gcval(o1)->fn)->l.pc = ptr;
+    
+    ptr2 = (&gcval(o2)->fn)->l.pc;
+    ptr1 = (&gcval(o1)->fn)->l.pc;
+    (&gcval(o1)->fn)->l.pc = ptr2;
+    (&gcval(o2)->fn)->l.pc = ptr1;
 
     lua_settop(L, 0);
     return 0;
