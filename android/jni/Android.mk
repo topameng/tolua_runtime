@@ -10,6 +10,7 @@ LOCAL_FORCE_STATIC_EXECUTABLE := true
 LOCAL_MODULE := tolua
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../luajit-2.1/src
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../pbc
 
 LOCAL_CPPFLAGS := -O2
 LOCAL_CFLAGS :=  -O2 -std=gnu99
@@ -36,6 +37,20 @@ LOCAL_SRC_FILES :=	../../tolua.c \
  					../../luasocket/udp.c \
  					../../luasocket/usocket.c \
  					../../luasocket/compat.c \
+					../../pbc/binding/lua/pbc-lua.c \
+					../../pbc/src/alloc.c \
+					../../pbc/src/array.c \
+					../../pbc/src/bootstrap.c \
+					../../pbc/src/context.c \
+					../../pbc/src/decode.c \
+					../../pbc/src/map.c \
+					../../pbc/src/pattern.c \
+					../../pbc/src/proto.c \
+					../../pbc/src/register.c \
+					../../pbc/src/rmessage.c \
+					../../pbc/src/stringpool.c \
+					../../pbc/src/varint.c \
+					../../pbc/src/wmessage.c \
 
 LOCAL_WHOLE_STATIC_LIBRARIES += libluajit
 include $(BUILD_SHARED_LIBRARY)
